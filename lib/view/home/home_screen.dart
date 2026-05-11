@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:koreanza/core/app_colors.dart';
 import 'package:koreanza/core/app_constants.dart';
+import 'package:koreanza/sharedwidgets/custom_drawer.dart';
 import 'package:koreanza/sharedwidgets/custombutton.dart';
 import 'package:koreanza/view/home/homescreen_widgets/featured_products.dart';
 import 'package:koreanza/view/home/homescreen_widgets/custom_tabbar.dart';
@@ -106,15 +107,21 @@ class HomeScreen extends StatelessWidget {
         }
       },
       child: Scaffold(
+        drawer: CustomDrawer(),
+
         backgroundColor: appColors.bg,
         appBar: AppBar(
           backgroundColor: appColors.bg,
           centerTitle: false,
           elevation: 0.5,
           shadowColor: appColors.subtitle.withValues(alpha: 0.3),
-          leading: IconButton(
-            icon: Icon(Icons.menu, color: appColors.primary),
-            onPressed: () {},
+          leading: Builder(
+            builder: (context) => IconButton(
+              icon: Icon(Icons.menu, color: appColors.primary),
+              onPressed: () {
+                Scaffold.of(context).openDrawer();
+              },
+            ),
           ),
           title: Text(
             "Koreanza",

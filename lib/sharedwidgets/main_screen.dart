@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:koreanza/core/app_colors.dart';
+import 'package:koreanza/view/cart/cart_screen.dart';
 import 'package:koreanza/view/home/home_screen.dart';
+import 'package:koreanza/view/profile/profile_screen.dart';
+import 'package:koreanza/view/shopping/shopping_screen.dart';
+import 'package:koreanza/view/wishlist/wishlist_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -14,13 +18,13 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
-  // 🔧 Replace with your actual screen widgets
+  // Replace with your actual screen widgets
   final List<Widget> _screens = [
     const HomeScreen(),
-    const Center(child: Text('Shop')),
-    const Center(child: Text('Wishlist')),
-    const Center(child: Text('Cart')),
-    const Center(child: Text('Profile')),
+    const ShoppingScreen(),
+    const WishlistScreen(),
+    const CartScreen(),
+    const ProfileScreen(),
   ];
 
   static const _navItems = [
@@ -80,7 +84,7 @@ class _MainScreenState extends State<MainScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Icon with pink circle when active
+                      // Icon with pink Rectangle when active
                       AnimatedContainer(
                         duration: const Duration(milliseconds: 250),
                         curve: Curves.easeInOut,
