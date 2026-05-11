@@ -130,18 +130,18 @@ class ShoppingScreen extends StatelessWidget {
                       vertical: 7.h,
                     ),
                     decoration: BoxDecoration(
-                      border: Border.all(color: appColors.primary, width: 1),
+                      color: appColors.secondary.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(20.r),
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.tune, color: appColors.primary, size: 14.r),
+                        Icon(Icons.tune, color: appColors.subtitle, size: 14.r),
                         SizedBox(width: 5.w),
                         Text(
                           "Refine",
                           style: TextStyle(
                             fontSize: 13.sp,
-                            color: appColors.primary,
+                            color: appColors.subtitle,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -200,14 +200,18 @@ class _FilterChip extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 7.h),
       decoration: BoxDecoration(
-        border: Border.all(color: appColors.primary, width: 1),
+        color: appColors.secondary.withValues(alpha: 0.2),
+        border: Border.all(
+          color: appColors.secondary.withValues(alpha: 0.3),
+          width: 1,
+        ),
         borderRadius: BorderRadius.circular(20.r),
       ),
       child: Text(
         label,
         style: TextStyle(
           fontSize: 12.sp,
-          color: appColors.primary,
+          color: appColors.subtitle,
           fontWeight: FontWeight.w500,
         ),
       ),
@@ -308,7 +312,7 @@ class _ProductCardState extends State<ProductCard> {
                     child: Icon(
                       _isFav ? Icons.favorite : Icons.favorite_border,
                       size: 16.r,
-                      color: appColors.primary,
+                      color: appColors.iconColor,
                     ),
                   ),
                 ),

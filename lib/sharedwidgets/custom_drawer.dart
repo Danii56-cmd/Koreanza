@@ -79,7 +79,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       onTap: () => setState(() => _selectedItem = 'Home'),
                     ),
                     _NavItem(
-                      icon: Icons.shopping_bag_outlined,
+                      icon: Icons.grid_view_outlined,
                       label: "Shop All",
                       isActive: _selectedItem == 'Shop All',
                       activeColor: appColors.primary,

@@ -54,7 +54,7 @@ class AppColors {
       subtitle: Color.fromARGB(255, 119, 84, 99),
       border: Color.fromARGB(255, 243, 214, 227),
       iconBg: const Color(0xFFFCE4EC),
-      iconColor: primaryPink,
+      iconColor: Color.fromARGB(255, 185, 10, 90),
       iconBgMuted: Colors.grey.withAlpha(10),
       iconMuted: mauveSubtitle,
       primary: primaryPink,
