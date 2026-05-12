@@ -24,4 +24,9 @@ class AppConstants {
   static String locationIcon = "assets/images/location.png";
   static String orderHistoryImage = "assets/images/radiance_boost_serum.png";
   static String orderHistoryImage2 = "assets/images/dewy_cloud_mousturizer.png";
+  static String productImage = "assets/images/luminous_glow_serum.png";
+  static String ritualProduct1 = "assets/images/velvet_cleanser.png";
+  static String ritualProduct2 = "assets/images/dewy_moustrizer.png";
+  static String ritualProduct3 = "assets/images/radiance_elexer.png";
+  static String ritualProduct4 = "assets/images/hydra_burst_mask.png";
 }

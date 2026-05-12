@@ -6,6 +6,7 @@ import 'package:koreanza/core/app_constants.dart';
 import 'package:koreanza/models/shopproducts_model.dart';
 import 'package:koreanza/sharedwidgets/custom_drawer.dart';
 import 'package:koreanza/sharedwidgets/custom_popscope.dart';
+import 'package:koreanza/view/productdetails/product_details_screen.dart';
 
 // Sample data
 final List<Product> _products = [
@@ -263,72 +264,82 @@ class _ProductCardState extends State<ProductCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Image with badge + heart
-          Stack(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
-                child: Image.asset(
-                  p.image,
-                  height: 160.h,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProductDetailsScreen()),
+              );
+            },
+            child: Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(16.r),
+                  ),
+                  child: Image.asset(
+                    p.image,
+                    height: 160.h,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
                 ),
-              ),
 
-              // Badge bottom-left (only if provided)
-              if (p.badge != null)
+                // Badge bottom-left (only if provided)
+                if (p.badge != null)
+                  Positioned(
+                    bottom: 10.h,
+                    left: 10.w,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 8.w,
+                        vertical: 4.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: p.badgeColor,
+                        borderRadius: BorderRadius.circular(20.r),
+                      ),
+                      child: Text(
+                        p.badge!,
+                        style: TextStyle(
+                          fontSize: 9.sp,
+                          color: appColors.surface,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                // Heart top-right
                 Positioned(
-                  bottom: 10.h,
-                  left: 10.w,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 8.w,
-                      vertical: 4.h,
-                    ),
-                    decoration: BoxDecoration(
-                      color: p.badgeColor,
-                      borderRadius: BorderRadius.circular(20.r),
-                    ),
-                    child: Text(
-                      p.badge!,
-                      style: TextStyle(
-                        fontSize: 9.sp,
+                  top: 8.r,
+                  right: 8.r,
+                  child: GestureDetector(
+                    onTap: () => setState(() => _isFav = !_isFav),
+                    child: Container(
+                      width: 32.r,
+                      height: 32.r,
+                      decoration: BoxDecoration(
                         color: appColors.surface,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.5,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: appColors.subtitle.withValues(alpha: 0.1),
+                            blurRadius: 6.r,
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        _isFav ? Icons.favorite : Icons.favorite_border,
+                        size: 16.r,
+                        color: appColors.iconColor,
                       ),
                     ),
                   ),
                 ),
-
-              // Heart top-right
-              Positioned(
-                top: 8.r,
-                right: 8.r,
-                child: GestureDetector(
-                  onTap: () => setState(() => _isFav = !_isFav),
-                  child: Container(
-                    width: 32.r,
-                    height: 32.r,
-                    decoration: BoxDecoration(
-                      color: appColors.surface,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: appColors.subtitle.withValues(alpha: 0.1),
-                          blurRadius: 6.r,
-                        ),
-                      ],
-                    ),
-                    child: Icon(
-                      _isFav ? Icons.favorite : Icons.favorite_border,
-                      size: 16.r,
-                      color: appColors.iconColor,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
 
           // Card body

@@ -32,25 +32,9 @@ class ReviewSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appColors = AppColors.of(context);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Header
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w),
-          child: Text(
-            'What Our Customers Say',
-            style: TextStyle(
-              fontSize: 18.sp,
-              fontWeight: FontWeight.w700,
-              color: appColors.title,
-              fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
-            ),
-          ),
-        ),
-        SizedBox(height: 14.h),
         // Horizontal list
         SizedBox(
           height: 150.h,
