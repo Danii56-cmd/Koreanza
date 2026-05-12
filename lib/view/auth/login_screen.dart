@@ -115,7 +115,7 @@ class LoginScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 24.h),
                     // Login Button
-                    PrimaryButton(
+                    CustomButton(
                       text: "Login",
                       icon: Icons.arrow_forward,
                       onPressed: () {

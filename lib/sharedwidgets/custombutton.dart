@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:koreanza/core/app_colors.dart'; // import your AppColors class
 
-class PrimaryButton extends StatelessWidget {
+class CustomButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
   final double? width;
@@ -11,7 +11,7 @@ class PrimaryButton extends StatelessWidget {
   final Color? buttonColor;
   final Color? textColor;
 
-  const PrimaryButton({
+  const CustomButton({
     super.key,
     required this.text,
     required this.onPressed,

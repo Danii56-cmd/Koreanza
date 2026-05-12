@@ -49,24 +49,12 @@ class HomeScreen extends StatelessWidget {
                       onPressed: () {
                         Navigator.of(context).pop(false);
                       },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: appColors.iconColor,
-                          borderRadius: BorderRadius.circular(10.r),
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 10.w,
-                            vertical: 05.h,
-                          ),
-                          child: Text(
-                            "Cancel",
-                            style: TextStyle(
-                              color: appColors.surface,
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                      child: Text(
+                        "Cancel",
+                        style: TextStyle(
+                          color: appColors.title,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
@@ -76,7 +64,7 @@ class HomeScreen extends StatelessWidget {
                       },
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Colors.red,
+                          color: appColors.iconColor,
                           borderRadius: BorderRadius.circular(10.r),
                         ),
                         child: Padding(
@@ -87,7 +75,7 @@ class HomeScreen extends StatelessWidget {
                           child: Text(
                             "Exit",
                             style: TextStyle(
-                              color: appColors.title,
+                              color: appColors.surface,
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
                             ),
@@ -192,7 +180,7 @@ class HomeScreen extends StatelessWidget {
                           ),
                         ),
                         SizedBox(height: 10.h),
-                        PrimaryButton(
+                        CustomButton(
                           width: 150.w,
                           height: 50.h,
                           text: "Shop Now",

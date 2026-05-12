@@ -89,12 +89,12 @@ class _MainScreenState extends State<MainScreen> {
                         duration: const Duration(milliseconds: 250),
                         curve: Curves.easeInOut,
                         padding: EdgeInsets.symmetric(
-                          horizontal: 10.w,
-                          vertical: 6.h,
+                          horizontal: 12.w,
+                          vertical: 5.h,
                         ),
                         decoration: BoxDecoration(
                           color: isActive
-                              ? appColors.primary.withValues(alpha: 0.12)
+                              ? appColors.primary.withValues(alpha: 0.10)
                               : Colors.transparent,
                           borderRadius: BorderRadius.circular(10.r),
                         ),

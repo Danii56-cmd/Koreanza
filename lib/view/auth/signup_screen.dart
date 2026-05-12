@@ -96,7 +96,7 @@ class SignUpScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 24.h),
                     // Login Button
-                    PrimaryButton(
+                    CustomButton(
                       text: "Create Account",
                       icon: Icons.arrow_forward,
                       onPressed: () {},
