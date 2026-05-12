@@ -6,6 +6,7 @@ import 'package:koreanza/sharedwidgets/custom_drawer.dart';
 import 'package:koreanza/sharedwidgets/custom_popscope.dart';
 import 'package:koreanza/sharedwidgets/custombutton.dart';
 import 'package:koreanza/models/shopproducts_model.dart';
+import 'package:koreanza/view/orderhistory/order_history_screen.dart';
 
 class CheckoutScreen extends StatelessWidget {
   final List<Map<String, dynamic>> cartItems;
@@ -21,11 +22,9 @@ class CheckoutScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final appColors = AppColors.of(context);
     return CustomPopScope(
-      onBackPop: () {
-        Navigator.pop(context);
-      },
       child: Scaffold(
         drawer: const CustomDrawer(),
+        drawerEnableOpenDragGesture: false,
         backgroundColor: appColors.bg,
         appBar: AppBar(
           backgroundColor: appColors.bg,
@@ -546,7 +545,14 @@ class CheckoutScreen extends StatelessWidget {
                         SizedBox(height: 20.h),
                         CustomButton(
                           text: "Place Order",
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => OrderHistoryScreen(),
+                              ),
+                            );
+                          },
                           buttonColor: appColors.iconColor,
                           icon: Icons.lock,
                         ),

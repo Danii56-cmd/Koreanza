@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:koreanza/services/tab_navigation_service.dart';
 
 class CustomPopScope extends StatelessWidget {
   const CustomPopScope({
     super.key,
     required this.child,
     this.onBackPop,
-    this.canPop = true,
+    this.canPop = false,
   });
 
   final Widget child;
@@ -18,11 +19,16 @@ class CustomPopScope extends StatelessWidget {
       canPop: canPop,
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
-
         if (onBackPop != null) {
           onBackPop!();
+          return;
+        }
+        final bool isNested = Navigator.of(context).canPop();
+
+        if (isNested) {
+          Navigator.of(context).pop();
         } else {
-          Navigator.pop(context);
+          TabNavigationService.instance.goToHome();
         }
       },
       child: child,

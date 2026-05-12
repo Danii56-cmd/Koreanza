@@ -5,6 +5,7 @@ import 'package:koreanza/core/app_colors.dart';
 import 'package:koreanza/core/app_constants.dart';
 import 'package:koreanza/models/wishlist_model.dart';
 import 'package:koreanza/sharedwidgets/custom_drawer.dart';
+import 'package:koreanza/sharedwidgets/custom_popscope.dart';
 
 // Sample data
 final List<WishlistProduct> _wishlistProducts = [
@@ -54,125 +55,131 @@ class WishlistScreen extends StatelessWidget {
     final appColors = AppColors.of(context);
     final cardWidth = (MediaQuery.of(context).size.width - 40.w - 14.w) / 2;
 
-    return Scaffold(
-      drawer: const CustomDrawer(),
-      backgroundColor: appColors.bg,
-      appBar: AppBar(
+    return CustomPopScope(
+      child: Scaffold(
+        drawer: const CustomDrawer(),
+        drawerEnableOpenDragGesture: false,
         backgroundColor: appColors.bg,
-        centerTitle: false,
-        elevation: 0.5,
-        shadowColor: appColors.subtitle.withValues(alpha: 0.3),
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: Icon(Icons.menu, color: appColors.primary),
-            onPressed: () => Scaffold.of(context).openDrawer(),
+        appBar: AppBar(
+          backgroundColor: appColors.bg,
+          centerTitle: false,
+          elevation: 0.5,
+          shadowColor: appColors.subtitle.withValues(alpha: 0.3),
+          leading: Builder(
+            builder: (context) => IconButton(
+              icon: Icon(Icons.menu, color: appColors.primary),
+              onPressed: () => Scaffold.of(context).openDrawer(),
+            ),
           ),
+          title: Text(
+            "Koreanza",
+            style: TextStyle(
+              fontSize: 24.sp,
+              fontWeight: FontWeight.w700,
+              color: appColors.primary,
+              fontStyle: FontStyle.italic,
+              letterSpacing: 1.5,
+            ),
+          ),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.search, color: appColors.primary),
+              onPressed: () {},
+            ),
+            IconButton(
+              icon: Icon(Icons.person_outline, color: appColors.primary),
+              onPressed: () {},
+            ),
+          ],
+          actionsPadding: EdgeInsets.only(right: 10.w),
         ),
-        title: Text(
-          "Koreanza",
-          style: TextStyle(
-            fontSize: 24.sp,
-            fontWeight: FontWeight.w700,
-            color: appColors.primary,
-            fontStyle: FontStyle.italic,
-            letterSpacing: 1.5,
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.search, color: appColors.primary),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: Icon(Icons.person_outline, color: appColors.primary),
-            onPressed: () {},
-          ),
-        ],
-        actionsPadding: EdgeInsets.only(right: 10.w),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Wishlist",
-                        style: TextStyle(
-                          fontSize: 22.sp,
-                          fontWeight: FontWeight.w600,
-                          color: appColors.title,
-                        ),
-                      ),
-                      Text(
-                        "12 Items",
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w500,
-                          color: appColors.subtitle,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Container(
-                    height: 40.h,
-                    width: 120.w,
-                    decoration: BoxDecoration(
-                      color: appColors.secondary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(20.r),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(Icons.share_outlined, color: appColors.iconColor),
-                        SizedBox(width: 5.w),
                         Text(
-                          "Share List",
+                          "Wishlist",
+                          style: TextStyle(
+                            fontSize: 22.sp,
+                            fontWeight: FontWeight.w600,
+                            color: appColors.title,
+                          ),
+                        ),
+                        Text(
+                          "12 Items",
                           style: TextStyle(
                             fontSize: 12.sp,
-                            color: appColors.iconColor,
+                            fontWeight: FontWeight.w500,
+                            color: appColors.subtitle,
                           ),
                         ),
                       ],
                     ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 20.h),
-              Wrap(
-                spacing: 14.w,
-                runSpacing: 14.h,
-                children: _wishlistProducts
-                    .map(
-                      (p) => SizedBox(
-                        width: cardWidth,
-                        child: WishlistProductCard(product: p),
+                    Container(
+                      height: 40.h,
+                      width: 120.w,
+                      decoration: BoxDecoration(
+                        color: appColors.secondary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(20.r),
                       ),
-                    )
-                    .toList(),
-              ),
-              SizedBox(height: 20.h),
-              Icon(
-                Icons.auto_awesome_outlined,
-                color: appColors.secondary,
-                size: 45.sp,
-              ),
-              Text(
-                "Add more favorites\nto your ritual",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w400,
-                  fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
-                  color: appColors.subtitle.withValues(alpha: 0.5),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.share_outlined,
+                            color: appColors.iconColor,
+                          ),
+                          SizedBox(width: 5.w),
+                          Text(
+                            "Share List",
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              color: appColors.iconColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
+                SizedBox(height: 20.h),
+                Wrap(
+                  spacing: 14.w,
+                  runSpacing: 14.h,
+                  children: _wishlistProducts
+                      .map(
+                        (p) => SizedBox(
+                          width: cardWidth,
+                          child: WishlistProductCard(product: p),
+                        ),
+                      )
+                      .toList(),
+                ),
+                SizedBox(height: 20.h),
+                Icon(
+                  Icons.auto_awesome_outlined,
+                  color: appColors.secondary,
+                  size: 45.sp,
+                ),
+                Text(
+                  "Add more favorites\nto your ritual",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w400,
+                    fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
+                    color: appColors.subtitle.withValues(alpha: 0.5),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

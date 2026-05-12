@@ -21,4 +21,7 @@ class AppConstants {
   static String cartIcon2 = "assets/images/cloud_whipped_cream.png";
   static String cartIcon3 = "assets/images/pure_petal_cleanser.png";
   static String checkoutProduct = "assets/images/lumière_vitality_serum.png";
+  static String locationIcon = "assets/images/location.png";
+  static String orderHistoryImage = "assets/images/radiance_boost_serum.png";
+  static String orderHistoryImage2 = "assets/images/dewy_cloud_mousturizer.png";
 }

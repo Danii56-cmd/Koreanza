@@ -17,7 +17,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final appColors = AppColors.of(context);
     return PopScope(
-      canPop: false,
+      canPop: true,
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
         final shouldExit = await showDialog<bool>(
@@ -96,7 +96,7 @@ class HomeScreen extends StatelessWidget {
       },
       child: Scaffold(
         drawer: CustomDrawer(),
-
+        drawerEnableOpenDragGesture: false,
         backgroundColor: appColors.bg,
         appBar: AppBar(
           backgroundColor: appColors.bg,

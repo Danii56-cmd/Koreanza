@@ -82,9 +82,9 @@ class _CartScreenState extends State<CartScreen> {
     final appColors = AppColors.of(context);
 
     return CustomPopScope(
-      onBackPop: () => Navigator.pop(context),
       child: Scaffold(
         drawer: const CustomDrawer(),
+        drawerEnableOpenDragGesture: false,
         backgroundColor: appColors.bg,
         appBar: AppBar(
           backgroundColor: appColors.bg,

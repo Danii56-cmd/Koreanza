@@ -5,6 +5,7 @@ import 'package:koreanza/core/app_colors.dart';
 import 'package:koreanza/core/app_constants.dart';
 import 'package:koreanza/models/shopproducts_model.dart';
 import 'package:koreanza/sharedwidgets/custom_drawer.dart';
+import 'package:koreanza/sharedwidgets/custom_popscope.dart';
 
 // Sample data
 final List<Product> _products = [
@@ -51,137 +52,147 @@ class ShoppingScreen extends StatelessWidget {
     final appColors = AppColors.of(context);
     final cardWidth = (MediaQuery.of(context).size.width - 40.w - 14.w) / 2;
 
-    return Scaffold(
-      drawer: const CustomDrawer(),
-      backgroundColor: appColors.bg,
-      appBar: AppBar(
+    return CustomPopScope(
+      child: Scaffold(
+        drawer: const CustomDrawer(),
+        drawerEnableOpenDragGesture: false,
         backgroundColor: appColors.bg,
-        centerTitle: false,
-        elevation: 0.5,
-        shadowColor: appColors.subtitle.withValues(alpha: 0.3),
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: Icon(Icons.menu, color: appColors.primary),
-            onPressed: () => Scaffold.of(context).openDrawer(),
+        appBar: AppBar(
+          backgroundColor: appColors.bg,
+          centerTitle: false,
+          elevation: 0.5,
+          shadowColor: appColors.subtitle.withValues(alpha: 0.3),
+          leading: Builder(
+            builder: (context) => IconButton(
+              icon: Icon(Icons.menu, color: appColors.primary),
+              onPressed: () => Scaffold.of(context).openDrawer(),
+            ),
           ),
+          title: Text(
+            "Koreanza",
+            style: TextStyle(
+              fontSize: 24.sp,
+              fontWeight: FontWeight.w700,
+              color: appColors.primary,
+              fontStyle: FontStyle.italic,
+              letterSpacing: 1.5,
+            ),
+          ),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.search, color: appColors.primary),
+              onPressed: () {},
+            ),
+            IconButton(
+              icon: Icon(Icons.person_outline, color: appColors.primary),
+              onPressed: () {},
+            ),
+          ],
+          actionsPadding: EdgeInsets.only(right: 10.w),
         ),
-        title: Text(
-          "Koreanza",
-          style: TextStyle(
-            fontSize: 24.sp,
-            fontWeight: FontWeight.w700,
-            color: appColors.primary,
-            fontStyle: FontStyle.italic,
-            letterSpacing: 1.5,
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.search, color: appColors.primary),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: Icon(Icons.person_outline, color: appColors.primary),
-            onPressed: () {},
-          ),
-        ],
-        actionsPadding: EdgeInsets.only(right: 10.w),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Search bar
-              TextField(
-                decoration: InputDecoration(
-                  hintText: 'Search skincare essentials...',
-                  hintStyle: TextStyle(color: Colors.black38, fontSize: 14.sp),
-                  prefixIcon: Icon(Icons.search, color: Colors.black38),
-                  contentPadding: EdgeInsets.symmetric(vertical: 14.h),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14.r),
-                    borderSide: BorderSide(color: Colors.black12),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14.r),
-                    borderSide: BorderSide(color: appColors.secondary),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Search bar
+                TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Search skincare essentials...',
+                    hintStyle: TextStyle(
+                      color: Colors.black38,
+                      fontSize: 14.sp,
+                    ),
+                    prefixIcon: Icon(Icons.search, color: Colors.black38),
+                    contentPadding: EdgeInsets.symmetric(vertical: 14.h),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14.r),
+                      borderSide: BorderSide(color: Colors.black12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14.r),
+                      borderSide: BorderSide(color: appColors.secondary),
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(height: 20.h),
+                SizedBox(height: 20.h),
 
-              // Curated Collection + Refine
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Curated Collection",
-                    style: TextStyle(
-                      fontSize: 20.sp,
-                      fontWeight: FontWeight.w700,
-                      color: appColors.title,
-                    ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 12.w,
-                      vertical: 7.h,
-                    ),
-                    decoration: BoxDecoration(
-                      color: appColors.secondary.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(20.r),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.tune, color: appColors.subtitle, size: 14.r),
-                        SizedBox(width: 5.w),
-                        Text(
-                          "Refine",
-                          style: TextStyle(
-                            fontSize: 13.sp,
-                            color: appColors.subtitle,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 12.h),
-
-              // Filter chips
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
+                // Curated Collection + Refine
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _FilterChip(label: "Skin Type: All"),
-                    SizedBox(width: 8.w),
-                    _FilterChip(label: "Concern: Glow"),
-                    SizedBox(width: 8.w),
-                    _FilterChip(label: "Price: Under \$50"),
+                    Text(
+                      "Curated Collection",
+                      style: TextStyle(
+                        fontSize: 20.sp,
+                        fontWeight: FontWeight.w700,
+                        color: appColors.title,
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12.w,
+                        vertical: 7.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: appColors.secondary.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(20.r),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.tune,
+                            color: appColors.subtitle,
+                            size: 14.r,
+                          ),
+                          SizedBox(width: 5.w),
+                          Text(
+                            "Refine",
+                            style: TextStyle(
+                              fontSize: 13.sp,
+                              color: appColors.subtitle,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
-              ),
-              SizedBox(height: 20.h),
+                SizedBox(height: 12.h),
 
-              // Product grid via Wrap
-              Wrap(
-                spacing: 14.w,
-                runSpacing: 14.h,
-                children: _products
-                    .map(
-                      (p) => SizedBox(
-                        width: cardWidth,
-                        child: ProductCard(product: p),
-                      ),
-                    )
-                    .toList(),
-              ),
-              SizedBox(height: 20.h),
-            ],
+                // Filter chips
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _FilterChip(label: "Skin Type: All"),
+                      SizedBox(width: 8.w),
+                      _FilterChip(label: "Concern: Glow"),
+                      SizedBox(width: 8.w),
+                      _FilterChip(label: "Price: Under \$50"),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 20.h),
+
+                // Product grid via Wrap
+                Wrap(
+                  spacing: 14.w,
+                  runSpacing: 14.h,
+                  children: _products
+                      .map(
+                        (p) => SizedBox(
+                          width: cardWidth,
+                          child: ProductCard(product: p),
+                        ),
+                      )
+                      .toList(),
+                ),
+                SizedBox(height: 20.h),
+              ],
+            ),
           ),
         ),
       ),
