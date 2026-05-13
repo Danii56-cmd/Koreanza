@@ -6,6 +6,7 @@ import 'package:koreanza/core/app_colors.dart';
 import 'package:koreanza/core/app_constants.dart';
 import 'package:koreanza/sharedwidgets/custom_drawer.dart';
 import 'package:koreanza/sharedwidgets/custom_popscope.dart';
+import 'package:koreanza/view/profile/profile_screen.dart';
 
 class AboutUs extends StatelessWidget {
   const AboutUs({super.key});
@@ -21,20 +22,24 @@ class AboutUs extends StatelessWidget {
         appBar: AppBar(
           backgroundColor: appColors.bg,
           centerTitle: false,
-          elevation: 0,
+          elevation: 0.5,
+          shadowColor: appColors.subtitle.withValues(alpha: 0.3),
           leading: Builder(
             builder: (context) => IconButton(
               icon: Icon(Icons.menu, color: appColors.primary),
-              onPressed: () => Scaffold.of(context).openDrawer(),
+              onPressed: () {
+                Scaffold.of(context).openDrawer();
+              },
             ),
           ),
           title: Text(
             "Koreanza",
             style: TextStyle(
-              fontSize: 22.sp,
+              fontSize: 24.sp,
               fontWeight: FontWeight.w700,
               color: appColors.primary,
               fontStyle: FontStyle.italic,
+              letterSpacing: 1.5,
             ),
           ),
           actions: [
@@ -44,9 +49,17 @@ class AboutUs extends StatelessWidget {
             ),
             IconButton(
               icon: Icon(Icons.person_outline, color: appColors.primary),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProfileScreen(),
+                  ),
+                );
+              },
             ),
           ],
+          actionsPadding: EdgeInsets.only(right: 10.w),
         ),
         body: SingleChildScrollView(
           child: Column(

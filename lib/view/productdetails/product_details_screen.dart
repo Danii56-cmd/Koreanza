@@ -6,6 +6,7 @@ import 'package:koreanza/core/app_constants.dart';
 import 'package:koreanza/sharedwidgets/custom_drawer.dart';
 import 'package:koreanza/sharedwidgets/custom_popscope.dart';
 import 'package:koreanza/view/home/homescreen_widgets/review_container.dart';
+import 'package:koreanza/view/profile/profile_screen.dart';
 
 class ProductDetailsScreen extends StatelessWidget {
   const ProductDetailsScreen({super.key});
@@ -46,7 +47,14 @@ class ProductDetailsScreen extends StatelessWidget {
             ),
             IconButton(
               icon: Icon(Icons.person_outline, color: appColors.primary),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProfileScreen(),
+                  ),
+                );
+              },
             ),
           ],
           actionsPadding: EdgeInsets.only(right: 10.w),

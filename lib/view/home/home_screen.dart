@@ -9,6 +9,7 @@ import 'package:koreanza/sharedwidgets/custombutton.dart';
 import 'package:koreanza/view/home/homescreen_widgets/featured_products.dart';
 import 'package:koreanza/view/home/homescreen_widgets/custom_tabbar.dart';
 import 'package:koreanza/view/home/homescreen_widgets/review_container.dart';
+import 'package:koreanza/view/profile/profile_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -128,7 +129,14 @@ class HomeScreen extends StatelessWidget {
             ),
             IconButton(
               icon: Icon(Icons.person_outline, color: appColors.primary),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProfileScreen(),
+                  ),
+                );
+              },
             ),
           ],
           actionsPadding: EdgeInsets.only(right: 10.w),

@@ -232,9 +232,11 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       activeColor: appColors.primary,
                       subtitleColor: appColors.subtitle,
                       onTap: () {
-                        Navigator.pop(context);
-                        Navigator.of(context, rootNavigator: true).push(
-                          MaterialPageRoute(builder: (_) => const AboutUs()),
+                        setState(() => _selectedItem = 'About Us');
+                        Navigator.pop(context); // close drawer
+                        TabNavigationService.instance.switchTabAndPush(
+                          4, // switch to last tab (Profile)
+                          const AboutUs(), // push AboutUs on top of it
                         );
                       },
                     ),

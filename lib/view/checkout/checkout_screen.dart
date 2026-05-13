@@ -7,6 +7,7 @@ import 'package:koreanza/sharedwidgets/custom_popscope.dart';
 import 'package:koreanza/sharedwidgets/custombutton.dart';
 import 'package:koreanza/models/shopproducts_model.dart';
 import 'package:koreanza/view/orderhistory/order_history_screen.dart';
+import 'package:koreanza/view/profile/profile_screen.dart';
 
 class CheckoutScreen extends StatelessWidget {
   final List<Map<String, dynamic>> cartItems;
@@ -54,7 +55,14 @@ class CheckoutScreen extends StatelessWidget {
             ),
             IconButton(
               icon: Icon(Icons.person_outline, color: appColors.primary),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProfileScreen(),
+                  ),
+                );
+              },
             ),
           ],
           actionsPadding: EdgeInsets.only(right: 10.w),

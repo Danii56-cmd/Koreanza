@@ -5,6 +5,7 @@ import 'package:koreanza/core/app_colors.dart';
 import 'package:koreanza/core/app_constants.dart';
 import 'package:koreanza/sharedwidgets/custom_drawer.dart';
 import 'package:koreanza/sharedwidgets/custom_popscope.dart';
+import 'package:koreanza/view/profile/profile_screen.dart';
 
 // Data models
 
@@ -125,7 +126,14 @@ class OrderHistoryScreen extends StatelessWidget {
             ),
             IconButton(
               icon: Icon(Icons.person_outline, color: appColors.primary),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProfileScreen(),
+                  ),
+                );
+              },
             ),
           ],
           actionsPadding: EdgeInsets.only(right: 10.w),

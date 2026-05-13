@@ -7,64 +7,49 @@ class TabNavigationService {
 
   static final TabNavigationService instance = TabNavigationService._();
 
-  // State
-
-  /// Always reflects the active tab index.
   final ValueNotifier<int> tabNotifier = ValueNotifier(0);
-
   int get currentIndex => tabNotifier.value;
 
   // Internal callbacks registered by MainScreen
-
   // ignore: unused_field
   VoidCallback? _goToHome;
-
   void Function(int index)? _switchTab;
-
   VoidCallback? _showRoutineTab;
-
   VoidCallback? _showWishlistTab;
+  void Function(Widget screen)? _pushScreen; // ← NEW
 
   // Register methods
+  void registerGoHome(VoidCallback callback) => _goToHome = callback;
+  void registerSwitchTab(void Function(int index) callback) =>
+      _switchTab = callback;
+  void registerShowRoutineTab(VoidCallback callback) =>
+      _showRoutineTab = callback;
+  void registerShowWishlistTab(VoidCallback callback) =>
+      _showWishlistTab = callback;
+  void registerPushScreen(void Function(Widget screen) callback) =>
+      _pushScreen = callback; // ← NEW
 
-  void registerGoHome(VoidCallback callback) {
-    _goToHome = callback;
-  }
-
-  void registerSwitchTab(void Function(int index) callback) {
-    _switchTab = callback;
-  }
-
-  void registerShowRoutineTab(VoidCallback callback) {
-    _showRoutineTab = callback;
-  }
-
-  void registerShowWishlistTab(VoidCallback callback) {
-    _showWishlistTab = callback;
-  }
-
-  /// Called by drawer or any widget
+  // Actions
   void switchTab(int index) {
     tabNotifier.value = index;
     _switchTab?.call(index);
   }
 
-  /// Called by MainScreen to sync notifier only
   void notifyTabChange(int index) {
     tabNotifier.value = index;
   }
 
-  void goToHome() {
-    switchTab(0);
-  }
+  void goToHome() => switchTab(0);
+  void openRoutineTab() => _showRoutineTab?.call();
+  void openWishlistTab() => _showWishlistTab?.call();
 
-  /// Opens Routine in bottom nav
-  void openRoutineTab() {
-    _showRoutineTab?.call();
-  }
+  /// Pushes any screen on top of the currently active tab's navigator ← NEW
+  void pushScreen(Widget screen) => _pushScreen?.call(screen);
 
-  /// Opens Wishlist in bottom nav
-  void openWishlistTab() {
-    _showWishlistTab?.call();
+  void switchTabAndPush(int index, Widget screen) {
+    switchTab(index);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _pushScreen?.call(screen);
+    });
   }
 }

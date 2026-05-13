@@ -6,6 +6,7 @@ import 'package:koreanza/core/app_constants.dart';
 import 'package:koreanza/models/wishlist_model.dart';
 import 'package:koreanza/sharedwidgets/custom_drawer.dart';
 import 'package:koreanza/sharedwidgets/custom_popscope.dart';
+import 'package:koreanza/view/profile/profile_screen.dart';
 
 // Sample data
 final List<WishlistProduct> _wishlistProducts = [
@@ -88,7 +89,14 @@ class WishlistScreen extends StatelessWidget {
             ),
             IconButton(
               icon: Icon(Icons.person_outline, color: appColors.primary),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProfileScreen(),
+                  ),
+                );
+              },
             ),
           ],
           actionsPadding: EdgeInsets.only(right: 10.w),

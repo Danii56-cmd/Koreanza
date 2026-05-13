@@ -7,6 +7,7 @@ import 'package:koreanza/models/shopproducts_model.dart';
 import 'package:koreanza/sharedwidgets/custom_drawer.dart';
 import 'package:koreanza/sharedwidgets/custom_popscope.dart';
 import 'package:koreanza/view/productdetails/product_details_screen.dart';
+import 'package:koreanza/view/profile/profile_screen.dart';
 
 // Sample data
 final List<Product> _products = [
@@ -86,7 +87,14 @@ class ShoppingScreen extends StatelessWidget {
             ),
             IconButton(
               icon: Icon(Icons.person_outline, color: appColors.primary),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProfileScreen(),
+                  ),
+                );
+              },
             ),
           ],
           actionsPadding: EdgeInsets.only(right: 10.w),

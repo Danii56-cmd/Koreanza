@@ -19,8 +19,6 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
-
-  /// Controls whether tab 2 is Wishlist or Routine
   bool _showRoutineTab = false;
 
   final List<GlobalKey<NavigatorState>> _navigatorKeys = List.generate(
@@ -31,34 +29,28 @@ class _MainScreenState extends State<MainScreen> {
   List<Widget> get _screens => [
     const HomeScreen(),
     const ShoppingScreen(),
-
     _showRoutineTab ? const RoutineScreen() : const WishlistScreen(),
-
     const CartScreen(),
-    const ProfileScreen(),
+    const ProfileScreen(isTab: true), // ← CHANGED
   ];
 
   List<_NavItem> get _navItems => [
     _NavItem(label: 'HOME', icon: Icons.home_outlined, activeIcon: Icons.home),
-
     _NavItem(
       label: 'SHOP',
       icon: Icons.grid_view_outlined,
       activeIcon: Icons.grid_view,
     ),
-
     _NavItem(
       label: _showRoutineTab ? 'ROUTINE' : 'WISHLIST',
       icon: Icons.favorite_outline,
       activeIcon: Icons.favorite,
     ),
-
     _NavItem(
       label: 'CART',
       icon: Icons.shopping_bag_outlined,
       activeIcon: Icons.shopping_bag,
     ),
-
     _NavItem(
       label: 'PROFILE',
       icon: Icons.person_outline,
@@ -69,16 +61,13 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
-    // Register tab switch callback
+
     TabNavigationService.instance.registerSwitchTab((index) {
       if (!mounted) return;
-
       if (_selectedIndex == index) {
         _navigatorKeys[index].currentState?.popUntil((r) => r.isFirst);
       } else {
-        setState(() {
-          _selectedIndex = index;
-        });
+        setState(() => _selectedIndex = index);
       }
     });
 
@@ -89,6 +78,14 @@ class _MainScreenState extends State<MainScreen> {
 
     TabNavigationService.instance.registerShowRoutineTab(showRoutineTab);
     TabNavigationService.instance.registerShowWishlistTab(showWishlistTab);
+
+    // ← NEW: push any screen on the active tab's nested navigator
+    TabNavigationService.instance.registerPushScreen((screen) {
+      if (!mounted) return;
+      _navigatorKeys[_selectedIndex].currentState?.push(
+        MaterialPageRoute(builder: (_) => screen),
+      );
+    });
   }
 
   void showRoutineTab() {
@@ -112,26 +109,17 @@ class _MainScreenState extends State<MainScreen> {
     if (nav != null && nav.canPop()) {
       nav.pop();
     } else if (_selectedIndex != 0) {
-      setState(() {
-        _selectedIndex = 0;
-      });
+      setState(() => _selectedIndex = 0);
       TabNavigationService.instance.notifyTabChange(0);
     }
   }
 
   void _onTabTapped(int index) {
-    if (index == 2) {
-      setState(() {
-        _showRoutineTab = false;
-      });
-    }
+    if (index == 2) setState(() => _showRoutineTab = false);
     if (_selectedIndex == index) {
       _navigatorKeys[index].currentState?.popUntil((route) => route.isFirst);
     } else {
-      setState(() {
-        _selectedIndex = index;
-      });
-
+      setState(() => _selectedIndex = index);
       TabNavigationService.instance.notifyTabChange(index);
     }
   }
@@ -139,20 +127,15 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     final appColors = AppColors.of(context);
-
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: _onPopInvoked,
-
       child: Scaffold(
-        // BODY
         body: IndexedStack(
           index: _selectedIndex,
-
           children: List.generate(_screens.length, (index) {
             return Navigator(
               key: _navigatorKeys[index],
-
               onGenerateRoute: (settings) => MaterialPageRoute(
                 settings: settings,
                 builder: (_) => _screens[index],
@@ -160,14 +143,10 @@ class _MainScreenState extends State<MainScreen> {
             );
           }),
         ),
-
-        // BOTTOM NAV
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
             color: appColors.surface,
-
             borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
-
             boxShadow: [
               BoxShadow(
                 color: appColors.title.withValues(alpha: 0.07),
@@ -176,74 +155,51 @@ class _MainScreenState extends State<MainScreen> {
               ),
             ],
           ),
-
           child: SafeArea(
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 10.h),
-
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
-
                 children: List.generate(_navItems.length, (index) {
                   final item = _navItems[index];
-
                   final bool isActive = _selectedIndex == index;
-
                   return GestureDetector(
                     onTap: () => _onTabTapped(index),
-
                     behavior: HitTestBehavior.opaque,
-
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 250),
-
                       curve: Curves.easeInOut,
-
                       padding: EdgeInsets.symmetric(
                         horizontal: 12.w,
                         vertical: 5.h,
                       ),
-
                       decoration: BoxDecoration(
                         color: isActive
                             ? appColors.primary.withValues(alpha: 0.10)
                             : Colors.transparent,
-
                         borderRadius: BorderRadius.circular(10.r),
                       ),
-
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
-
                         children: [
-                          // Icon
                           Icon(
                             isActive ? item.activeIcon : item.icon,
-
                             size: 22.r,
-
                             color: isActive
                                 ? appColors.primary
                                 : appColors.subtitle,
                           ),
-
                           SizedBox(height: 2.h),
-
-                          // Label
                           Text(
                             item.label,
-
                             style: TextStyle(
                               fontSize: 8.sp,
-
                               fontWeight: isActive
                                   ? FontWeight.w700
                                   : FontWeight.w400,
-
                               color: isActive
                                   ? appColors.primary
                                   : appColors.subtitle,
-
                               fontFamily:
                                   GoogleFonts.plusJakartaSans().fontFamily,
                             ),
@@ -262,12 +218,10 @@ class _MainScreenState extends State<MainScreen> {
   }
 }
 
-// Nav Item Model
 class _NavItem {
   final String label;
   final IconData icon;
   final IconData activeIcon;
-
   const _NavItem({
     required this.label,
     required this.icon,
