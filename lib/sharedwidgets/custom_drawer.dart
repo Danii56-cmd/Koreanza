@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:koreanza/core/app_colors.dart';
 import 'package:koreanza/core/app_constants.dart';
+import 'package:koreanza/services/tab_navigation_service.dart';
+import 'package:koreanza/view/aboutus/aboutus_screen.dart';
+import 'package:koreanza/view/orderhistory/order_history_screen.dart';
 
 class CustomDrawer extends StatefulWidget {
   const CustomDrawer({super.key});
@@ -11,7 +14,34 @@ class CustomDrawer extends StatefulWidget {
 }
 
 class _CustomDrawerState extends State<CustomDrawer> {
+  // Maps bottom-nav index → drawer label (only for tabs that exist in the nav bar)
+  final _indexToLabel = {
+    0: 'Home',
+    1: 'Shop All',
+    2: 'Wishlist',
+    3: 'Cart',
+    4: 'Settings',
+  };
+
   String _selectedItem = 'Home';
+
+  @override
+  void initState() {
+    super.initState();
+    _syncIndex();
+    TabNavigationService.instance.tabNotifier.addListener(_syncIndex);
+  }
+
+  @override
+  void dispose() {
+    TabNavigationService.instance.tabNotifier.removeListener(_syncIndex);
+    super.dispose();
+  }
+
+  void _syncIndex() {
+    final label = _indexToLabel[TabNavigationService.instance.currentIndex];
+    if (label != null && mounted) setState(() => _selectedItem = label);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +55,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
           children: [
             // Profile Header
             Container(
-              // width: double.infinity,
               padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,7 +105,11 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       isActive: _selectedItem == 'Home',
                       activeColor: appColors.primary,
                       subtitleColor: appColors.subtitle,
-                      onTap: () => setState(() => _selectedItem = 'Home'),
+                      onTap: () {
+                        setState(() => _selectedItem = 'Home');
+                        Navigator.pop(context);
+                        TabNavigationService.instance.switchTab(0);
+                      },
                     ),
                     _NavItem(
                       icon: Icons.grid_view_outlined,
@@ -84,7 +117,11 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       isActive: _selectedItem == 'Shop All',
                       activeColor: appColors.primary,
                       subtitleColor: appColors.subtitle,
-                      onTap: () => setState(() => _selectedItem = 'Shop All'),
+                      onTap: () {
+                        setState(() => _selectedItem = 'Shop All');
+                        Navigator.pop(context);
+                        TabNavigationService.instance.switchTab(1);
+                      },
                     ),
 
                     // Categories section
@@ -111,7 +148,11 @@ class _CustomDrawerState extends State<CustomDrawer> {
                         titleColor: appColors.title,
                         isActive: _selectedItem == cat,
                         activeColor: appColors.primary,
-                        onTap: () => setState(() => _selectedItem = cat),
+                        onTap: () {
+                          setState(() => _selectedItem = cat);
+                          Navigator.pop(context);
+                          TabNavigationService.instance.switchTab(1);
+                        },
                       ),
                     ),
 
@@ -133,7 +174,17 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       isActive: _selectedItem == 'My Routine',
                       activeColor: appColors.primary,
                       subtitleColor: appColors.subtitle,
-                      onTap: () => setState(() => _selectedItem = 'My Routine'),
+
+                      onTap: () {
+                        setState(() {
+                          _selectedItem = 'My Routine';
+                        });
+
+                        Navigator.pop(context);
+
+                        // Open Routine inside bottom nav
+                        TabNavigationService.instance.openRoutineTab();
+                      },
                     ),
                     _NavItem(
                       icon: Icons.favorite_border,
@@ -141,7 +192,11 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       isActive: _selectedItem == 'Wishlist',
                       activeColor: appColors.primary,
                       subtitleColor: appColors.subtitle,
-                      onTap: () => setState(() => _selectedItem = 'Wishlist'),
+                      onTap: () {
+                        setState(() => _selectedItem = 'Wishlist');
+                        Navigator.pop(context);
+                        TabNavigationService.instance.switchTab(2);
+                      },
                     ),
                     _NavItem(
                       icon: Icons.history,
@@ -149,8 +204,14 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       isActive: _selectedItem == 'Order History',
                       activeColor: appColors.primary,
                       subtitleColor: appColors.subtitle,
-                      onTap: () =>
-                          setState(() => _selectedItem = 'Order History'),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.of(context, rootNavigator: true).push(
+                          MaterialPageRoute(
+                            builder: (_) => OrderHistoryScreen(),
+                          ),
+                        );
+                      },
                     ),
                     _NavItem(
                       icon: Icons.settings_outlined,
@@ -158,7 +219,11 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       isActive: _selectedItem == 'Settings',
                       activeColor: appColors.primary,
                       subtitleColor: appColors.subtitle,
-                      onTap: () => setState(() => _selectedItem = 'Settings'),
+                      onTap: () {
+                        setState(() => _selectedItem = 'Settings');
+                        Navigator.pop(context);
+                        TabNavigationService.instance.switchTab(4);
+                      },
                     ),
                     _NavItem(
                       icon: Icons.info_outline,
@@ -166,7 +231,12 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       isActive: _selectedItem == 'About Us',
                       activeColor: appColors.primary,
                       subtitleColor: appColors.subtitle,
-                      onTap: () => setState(() => _selectedItem = 'About Us'),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.of(context, rootNavigator: true).push(
+                          MaterialPageRoute(builder: (_) => const AboutUs()),
+                        );
+                      },
                     ),
                   ],
                 ),

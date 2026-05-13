@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:koreanza/core/app_colors.dart';
-import 'package:koreanza/core/app_constants.dart';
 
 class CustomTabBar extends StatelessWidget {
   const CustomTabBar({super.key});
@@ -10,26 +9,28 @@ class CustomTabBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final appColors = AppColors.of(context);
 
-    final List<Map<String, String>> tabs = [
-      {'icon': AppConstants.homeIcon1, 'label': 'Face'},
-      {'icon': AppConstants.homeIcon2, 'label': 'Acne'},
-      {'icon': AppConstants.homeIcon3, 'label': 'Glow'},
-      {'icon': AppConstants.homeIcon4, 'label': 'Serum'},
+    final List<Map<String, dynamic>> tabs = [
+      {'icon': Icons.face_outlined, 'label': 'Face'},
+      {'icon': Icons.clean_hands_outlined, 'label': 'Acne'},
+      {'icon': Icons.wb_sunny_outlined, 'label': 'Glow'},
+      {'icon': Icons.water_drop_outlined, 'label': 'Serum'},
     ];
 
     return SizedBox(
-      height: 90.h, // increased to fit label
+      height: 85.h,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: tabs.length,
-        padding: EdgeInsets.symmetric(horizontal: 12.w),
+        padding: EdgeInsets.symmetric(horizontal: 16.w),
         itemBuilder: (context, index) {
           return Padding(
-            padding: EdgeInsets.symmetric(horizontal: 10.w),
+            padding: EdgeInsets.only(
+              right: 30.w,
+            ), // Matching the spacing in your Home.jpg
             child: TabBarIcons(
               appColors: appColors,
-              iconPath: tabs[index]['icon']!,
-              label: tabs[index]['label']!,
+              icon: tabs[index]['icon'] as IconData,
+              label: tabs[index]['label'] as String,
             ),
           );
         },
@@ -39,50 +40,46 @@ class CustomTabBar extends StatelessWidget {
 }
 
 class TabBarIcons extends StatelessWidget {
-  final String iconPath;
+  final IconData icon;
   final String label;
   final AppColors appColors;
 
   const TabBarIcons({
     super.key,
     required this.appColors,
-    required this.iconPath,
+    required this.icon,
     required this.label,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        // handle tab selection
-      },
+      onTap: () {},
       child: Column(
-        // ← wrap in Column
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 55.w,
-            height: 55.w,
+            width: 50.w, // Shorter width (was 60.w)
+            height: 50.w, // Shorter height (was 60.w)
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: appColors.secondary,
+              color: appColors.primary.withValues(alpha: 0.12),
             ),
             child: Center(
-              child: Image.asset(
-                iconPath,
-                // width: 35.w,
-                // height: 35.w,
-                color: appColors.title,
+              child: Icon(
+                icon,
+                size: 24.sp, // Scaled down icon (was 28.sp)
+                color: appColors.subtitle,
               ),
             ),
           ),
-          SizedBox(height: 6.h),
+          SizedBox(height: 6.h), // Tighter gap (was 8.h)
           Text(
             label,
             style: TextStyle(
-              fontSize: 12.sp,
+              fontSize: 12.sp, // Slightly smaller text (was 13.sp)
               color: appColors.title,
-              fontWeight: FontWeight.w400,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],

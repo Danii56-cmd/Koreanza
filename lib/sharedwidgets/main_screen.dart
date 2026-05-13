@@ -5,6 +5,7 @@ import 'package:koreanza/core/app_colors.dart';
 import 'package:koreanza/services/tab_navigation_service.dart';
 import 'package:koreanza/view/cart/cart_screen.dart';
 import 'package:koreanza/view/home/home_screen.dart';
+import 'package:koreanza/view/myroutine/my_routine_screen.dart';
 import 'package:koreanza/view/profile/profile_screen.dart';
 import 'package:koreanza/view/shopping/shopping_screen.dart';
 import 'package:koreanza/view/wishlist/wishlist_screen.dart';
@@ -19,32 +20,45 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
-  // One GlobalKey<NavigatorState> per tab so each tab owns its own nav stack.
+  /// Controls whether tab 2 is Wishlist or Routine
+  bool _showRoutineTab = false;
+
   final List<GlobalKey<NavigatorState>> _navigatorKeys = List.generate(
     5,
     (_) => GlobalKey<NavigatorState>(),
   );
 
-  // Root screen for every tab — created once in initState.
-  late final List<Widget> _screens;
+  List<Widget> get _screens => [
+    const HomeScreen(),
+    const ShoppingScreen(),
 
-  static const List<_NavItem> _navItems = [
+    _showRoutineTab ? const RoutineScreen() : const WishlistScreen(),
+
+    const CartScreen(),
+    const ProfileScreen(),
+  ];
+
+  List<_NavItem> get _navItems => [
     _NavItem(label: 'HOME', icon: Icons.home_outlined, activeIcon: Icons.home),
+
     _NavItem(
       label: 'SHOP',
       icon: Icons.grid_view_outlined,
       activeIcon: Icons.grid_view,
     ),
+
     _NavItem(
-      label: 'WISHLIST',
+      label: _showRoutineTab ? 'ROUTINE' : 'WISHLIST',
       icon: Icons.favorite_outline,
       activeIcon: Icons.favorite,
     ),
+
     _NavItem(
       label: 'CART',
       icon: Icons.shopping_bag_outlined,
       activeIcon: Icons.shopping_bag,
     ),
+
     _NavItem(
       label: 'PROFILE',
       icon: Icons.person_outline,
@@ -52,70 +66,93 @@ class _MainScreenState extends State<MainScreen> {
     ),
   ];
 
-  // Lifecycle
-
   @override
   void initState() {
     super.initState();
-
-    _screens = [
-      const HomeScreen(),
-      const ShoppingScreen(),
-      const WishlistScreen(),
-      const CartScreen(),
-      const ProfileScreen(),
-    ];
-
-    // Register the go-home callback so CustomPopScope can trigger a tab switch
-    // from any screen without needing BuildContext or state management.
-    TabNavigationService.instance.registerGoHome(() {
+    // Register tab switch callback
+    TabNavigationService.instance.registerSwitchTab((index) {
       if (!mounted) return;
-      if (_selectedIndex != 0) {
-        setState(() => _selectedIndex = 0);
+
+      if (_selectedIndex == index) {
+        _navigatorKeys[index].currentState?.popUntil((r) => r.isFirst);
+      } else {
+        setState(() {
+          _selectedIndex = index;
+        });
       }
     });
+
+    TabNavigationService.instance.registerGoHome(() {
+      if (!mounted) return;
+      TabNavigationService.instance.switchTab(0);
+    });
+
+    TabNavigationService.instance.registerShowRoutineTab(showRoutineTab);
+    TabNavigationService.instance.registerShowWishlistTab(showWishlistTab);
   }
 
-  // Helpers
+  void showRoutineTab() {
+    setState(() {
+      _showRoutineTab = true;
+      _selectedIndex = 2;
+    });
+    TabNavigationService.instance.notifyTabChange(2);
+  }
+
+  void showWishlistTab() {
+    setState(() {
+      _showRoutineTab = false;
+      _selectedIndex = 2;
+    });
+    TabNavigationService.instance.notifyTabChange(2);
+  }
 
   void _onPopInvoked(bool didPop, _) {
     final NavigatorState? nav = _navigatorKeys[_selectedIndex].currentState;
-
     if (nav != null && nav.canPop()) {
-      // Still has routes inside the tab stack → pop one level.
       nav.pop();
     } else if (_selectedIndex != 0) {
-      // At the root of a non-home tab → go to Home.
-      setState(() => _selectedIndex = 0);
+      setState(() {
+        _selectedIndex = 0;
+      });
+      TabNavigationService.instance.notifyTabChange(0);
     }
   }
 
   void _onTabTapped(int index) {
+    if (index == 2) {
+      setState(() {
+        _showRoutineTab = false;
+      });
+    }
     if (_selectedIndex == index) {
       _navigatorKeys[index].currentState?.popUntil((route) => route.isFirst);
     } else {
-      setState(() => _selectedIndex = index);
+      setState(() {
+        _selectedIndex = index;
+      });
+
+      TabNavigationService.instance.notifyTabChange(index);
     }
   }
-
-  // Build
 
   @override
   Widget build(BuildContext context) {
     final appColors = AppColors.of(context);
 
     return PopScope(
-      // Never let the root navigator pop — we control back behaviour ourselves.
       canPop: false,
       onPopInvokedWithResult: _onPopInvoked,
+
       child: Scaffold(
-        // Body
+        // BODY
         body: IndexedStack(
           index: _selectedIndex,
+
           children: List.generate(_screens.length, (index) {
             return Navigator(
               key: _navigatorKeys[index],
-              // Each tab starts with its root screen.
+
               onGenerateRoute: (settings) => MaterialPageRoute(
                 settings: settings,
                 builder: (_) => _screens[index],
@@ -124,11 +161,13 @@ class _MainScreenState extends State<MainScreen> {
           }),
         ),
 
-        // Bottom Navigation Bar
+        // BOTTOM NAV
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
             color: appColors.surface,
+
             borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+
             boxShadow: [
               BoxShadow(
                 color: appColors.title.withValues(alpha: 0.07),
@@ -137,54 +176,74 @@ class _MainScreenState extends State<MainScreen> {
               ),
             ],
           ),
+
           child: SafeArea(
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 10.h),
+
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
+
                 children: List.generate(_navItems.length, (index) {
-                  final _NavItem item = _navItems[index];
+                  final item = _navItems[index];
+
                   final bool isActive = _selectedIndex == index;
 
                   return GestureDetector(
                     onTap: () => _onTabTapped(index),
+
                     behavior: HitTestBehavior.opaque,
+
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 250),
+
                       curve: Curves.easeInOut,
+
                       padding: EdgeInsets.symmetric(
                         horizontal: 12.w,
                         vertical: 5.h,
                       ),
+
                       decoration: BoxDecoration(
                         color: isActive
                             ? appColors.primary.withValues(alpha: 0.10)
                             : Colors.transparent,
+
                         borderRadius: BorderRadius.circular(10.r),
                       ),
+
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
+
                         children: [
                           // Icon
                           Icon(
                             isActive ? item.activeIcon : item.icon,
+
                             size: 22.r,
+
                             color: isActive
                                 ? appColors.primary
                                 : appColors.subtitle,
                           ),
+
                           SizedBox(height: 2.h),
+
                           // Label
                           Text(
                             item.label,
+
                             style: TextStyle(
                               fontSize: 8.sp,
+
                               fontWeight: isActive
                                   ? FontWeight.w700
                                   : FontWeight.w400,
+
                               color: isActive
                                   ? appColors.primary
                                   : appColors.subtitle,
+
                               fontFamily:
                                   GoogleFonts.plusJakartaSans().fontFamily,
                             ),
@@ -203,7 +262,7 @@ class _MainScreenState extends State<MainScreen> {
   }
 }
 
-// Type-safe nav item model
+// Nav Item Model
 class _NavItem {
   final String label;
   final IconData icon;
