@@ -28,7 +28,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         centerTitle: false,
         elevation: 0.5,
         shadowColor: appColors.subtitle.withValues(alpha: 0.3),
-        leadingWidth: 45.w,
+        leadingWidth: 30.w,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: appColors.primary),
           onPressed: () {

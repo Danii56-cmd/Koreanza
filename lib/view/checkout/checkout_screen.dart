@@ -30,6 +30,7 @@ class CheckoutScreen extends StatelessWidget {
         appBar: AppBar(
           backgroundColor: appColors.bg,
           centerTitle: false,
+          leadingWidth: 30.w,
           elevation: 0.5,
           shadowColor: appColors.subtitle.withValues(alpha: 0.3),
           leading: Builder(

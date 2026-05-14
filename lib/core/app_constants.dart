@@ -29,4 +29,11 @@ class AppConstants {
   static String aboutUs2 = "assets/images/about_us2.png";
   static String aboutUs3 = "assets/images/about_us3.png";
   static String aboutUs4 = "assets/images/about_us4.png";
+  static String routineProduct1 = "assets/images/glow_cleanser.png";
+  static String routineProduct2 = "assets/images/mist_essence.png";
+  static String routineProduct3 = "assets/images/daily_shield.png";
+  static String nightProduct1 = "assets/images/silk_cleansing.png";
+  static String nightProduct2 = "assets/images/night_repair_serum.png";
+  static String nightProduct3 = "assets/images/cloud_cream.png";
+  static String nightProduct4 = "assets/images/brighten_eye_gel.png";
 }

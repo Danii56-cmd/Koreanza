@@ -29,7 +29,7 @@ class _MainScreenState extends State<MainScreen> {
   List<Widget> get _screens => [
     const HomeScreen(),
     const ShoppingScreen(),
-    _showRoutineTab ? const RoutineScreen() : const WishlistScreen(),
+    _showRoutineTab ? RoutineScreen() : const WishlistScreen(),
     const CartScreen(),
     const ProfileScreen(isTab: true), // ← CHANGED
   ];

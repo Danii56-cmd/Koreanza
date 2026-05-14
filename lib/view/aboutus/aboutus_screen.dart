@@ -23,6 +23,7 @@ class AboutUs extends StatelessWidget {
           backgroundColor: appColors.bg,
           centerTitle: false,
           elevation: 0.5,
+          leadingWidth: 30.w,
           shadowColor: appColors.subtitle.withValues(alpha: 0.3),
           leading: Builder(
             builder: (context) => IconButton(

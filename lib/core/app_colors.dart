@@ -32,7 +32,7 @@ class AppColors {
 
   factory AppColors.of(BuildContext context) {
     // Korenza Brand Colors (Light Only)
-    const primaryPink = Color(0xFFF43F86);
+    const primaryPink = Color.fromARGB(255, 255, 77, 141);
     const softPinkBg = Color.fromARGB(255, 255, 248, 248);
     const charcoalTitle = Color(0xFF2E1F24);
     const mauveSubtitle = Color(0xFF8E7E83);
