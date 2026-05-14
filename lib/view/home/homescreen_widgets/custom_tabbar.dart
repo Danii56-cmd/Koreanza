@@ -20,6 +20,7 @@ class CustomTabBar extends StatelessWidget {
       height: 85.h,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
+        physics: const NeverScrollableScrollPhysics(),
         itemCount: tabs.length,
         padding: EdgeInsets.symmetric(horizontal: 16.w),
         itemBuilder: (context, index) {

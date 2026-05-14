@@ -198,10 +198,13 @@ class RoutineScreen extends StatelessWidget {
                       color: appColors.title,
                       borderRadius: BorderRadius.circular(30.r),
                     ),
-                    child: Icon(
-                      Icons.nightlight_outlined,
-                      color: appColors.surface,
-                      size: 20.sp,
+                    child: Transform.rotate(
+                      angle: -0.6,
+                      child: Icon(
+                        Icons.nightlight_outlined,
+                        color: appColors.surface,
+                        size: 20.sp,
+                      ),
                     ),
                   ),
                   title: Text(
@@ -408,7 +411,7 @@ class ConsistencyStreakCard extends StatelessWidget {
   ConsistencyStreakCard({super.key});
 
   final List<double> barValues = [0.4, 0.55, 0.3, 0.85, 0.6];
-  static const double maxHeight = 120; // max bar height
+  static const double maxHeight = 150; // max bar height
 
   @override
   Widget build(BuildContext context) {
@@ -447,7 +450,6 @@ class ConsistencyStreakCard extends StatelessWidget {
               color: appColors.subtitle,
             ),
           ),
-          SizedBox(height: 20.h),
           SizedBox(
             height: maxHeight.h,
             child: Row(
@@ -476,7 +478,10 @@ class ConsistencyStreakCard extends StatelessWidget {
         width: 42.w,
         child: Column(
           children: [
-            Container(height: unfilledHeight, color: appColors.secondary),
+            Container(
+              height: unfilledHeight,
+              color: appColors.secondary.withValues(alpha: 0.3),
+            ),
             Container(height: filledHeight, color: appColors.primary),
           ],
         ),

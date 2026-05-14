@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:koreanza/core/app_colors.dart';
 import 'package:koreanza/core/app_constants.dart';
+import 'package:koreanza/view/productdetails/product_details_screen.dart';
 
 class FeaturedProducts extends StatefulWidget {
   const FeaturedProducts({super.key});
@@ -57,7 +58,7 @@ class _FeaturedProductsState extends State<FeaturedProducts> {
       children: [
         // Header row
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w),
+          padding: EdgeInsets.symmetric(horizontal: 20.w),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -88,9 +89,7 @@ class _FeaturedProductsState extends State<FeaturedProducts> {
             ],
           ),
         ),
-
         SizedBox(height: 14.h),
-
         // Horizontal product list
         SizedBox(
           height: 300.h,
@@ -98,7 +97,7 @@ class _FeaturedProductsState extends State<FeaturedProducts> {
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
             itemCount: _products.length,
-            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            padding: EdgeInsets.only(left: 20.w),
             itemBuilder: (context, index) {
               final product = _products[index];
               return _ProductCard(
@@ -161,167 +160,183 @@ class _ProductCardState extends State<_ProductCard> {
   Widget build(BuildContext context) {
     final c = widget.appColors;
 
-    return Container(
-      width: 200.w,
-      margin: EdgeInsets.only(right: 14.w, bottom: 20.h),
-      decoration: BoxDecoration(
-        color: c.surface,
-        borderRadius: BorderRadius.circular(20.r),
-        boxShadow: [
-          BoxShadow(
-            color: c.title.withValues(alpha: 0.08),
-            blurRadius: 16.r,
-            offset: Offset(0, 4.r),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Image + heart
-          Stack(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
-                child: Image.asset(
-                  AppConstants.glow,
-                  // color: c.primary.withValues(alpha: 0.2),
-                  height: 170.h,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              // Pink gradient overlay at bottom of image
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(20.r),
-                  ),
-                  child: Container(
-                    height: 60.h,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.transparent,
-                          c.primary.withValues(alpha: 0.08),
-                        ],
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              // Tappable heart with toggle
-              Positioned(
-                top: 8.r,
-                right: 8.r,
-                child: GestureDetector(
-                  onTap: () => setState(() => _isFav = !_isFav),
-                  child: Container(
-                    width: 30.r,
-                    height: 30.r,
-                    decoration: BoxDecoration(
-                      color: c.surface,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: c.title.withValues(alpha: 0.1),
-                          blurRadius: 6.r,
-                        ),
-                      ],
-                    ),
-                    child: Icon(
-                      _isFav ? Icons.favorite : Icons.favorite_border,
-                      size: 16.r,
-                      color: _isFav ? Colors.red : c.primary,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          // Text + button
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return Padding(
+      padding: const EdgeInsets.only(right: 8.0),
+      child: Container(
+        width: 200.w,
+        margin: EdgeInsets.only(right: 14.w, bottom: 20.h),
+        decoration: BoxDecoration(
+          color: c.surface,
+          borderRadius: BorderRadius.circular(20.r),
+          boxShadow: [
+            BoxShadow(
+              color: c.title.withValues(alpha: 0.08),
+              blurRadius: 16.r,
+              offset: Offset(0, 4.r),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Image + heart
+            Stack(
               children: [
-                // Name + price on same row
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        widget.name,
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          color: c.title,
-                          fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ProductDetailsScreen(),
                       ),
+                    );
+                  },
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(20.r),
                     ),
-                    Text(
-                      widget.price,
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w700,
-                        color: c.primary,
-                        fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
-                      ),
+                    child: Image.asset(
+                      AppConstants.glow,
+                      // color: c.primary.withValues(alpha: 0.2),
+                      height: 170.h,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
                     ),
-                  ],
-                ),
-                SizedBox(height: 3.h),
-                Text(
-                  widget.subtitle,
-                  style: TextStyle(
-                    fontSize: 11.sp,
-                    color: c.subtitle,
-                    fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
                   ),
                 ),
-                SizedBox(height: 10.h),
-                // Add to Cart button
-                SizedBox(
-                  width: double.infinity,
-                  height: 35.h,
-                  child: ElevatedButton.icon(
-                    onPressed: () {},
-                    icon: Icon(
-                      Icons.shopping_bag_outlined,
-                      size: 13.r,
-                      // color: c.title,
+                // Pink gradient overlay at bottom of image
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(20.r),
                     ),
-                    label: Text(
-                      'Add to Cart',
-                      style: TextStyle(
-                        fontSize: 11.sp,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
+                    child: Container(
+                      height: 60.h,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.transparent,
+                            c.primary.withValues(alpha: 0.08),
+                          ],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                        ),
                       ),
                     ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: c.secondary,
-                      foregroundColor: c.subtitle,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.r),
+                  ),
+                ),
+                // Tappable heart with toggle
+                Positioned(
+                  top: 8.r,
+                  right: 8.r,
+                  child: GestureDetector(
+                    onTap: () => setState(() => _isFav = !_isFav),
+                    child: Container(
+                      width: 30.r,
+                      height: 30.r,
+                      decoration: BoxDecoration(
+                        color: c.surface,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: c.title.withValues(alpha: 0.1),
+                            blurRadius: 6.r,
+                          ),
+                        ],
                       ),
-                      padding: EdgeInsets.zero,
+                      child: Icon(
+                        _isFav ? Icons.favorite : Icons.favorite_border,
+                        size: 16.r,
+                        color: _isFav ? Colors.red : c.primary,
+                      ),
                     ),
                   ),
                 ),
               ],
             ),
-          ),
-        ],
+
+            // Text + button
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Name + price on same row
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          widget.name,
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            color: c.title,
+                            fontFamily:
+                                GoogleFonts.plusJakartaSans().fontFamily,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Text(
+                        widget.price,
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w700,
+                          color: c.primary,
+                          fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 3.h),
+                  Text(
+                    widget.subtitle,
+                    style: TextStyle(
+                      fontSize: 11.sp,
+                      color: c.subtitle,
+                      fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
+                    ),
+                  ),
+                  SizedBox(height: 10.h),
+                  // Add to Cart button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 35.h,
+                    child: ElevatedButton.icon(
+                      onPressed: () {},
+                      icon: Icon(
+                        Icons.shopping_bag_outlined,
+                        size: 13.r,
+                        // color: c.title,
+                      ),
+                      label: Text(
+                        'Add to Cart',
+                        style: TextStyle(
+                          fontSize: 11.sp,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: c.secondary,
+                        foregroundColor: c.subtitle,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.r),
+                        ),
+                        padding: EdgeInsets.zero,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

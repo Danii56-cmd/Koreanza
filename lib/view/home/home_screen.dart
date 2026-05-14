@@ -10,6 +10,7 @@ import 'package:koreanza/view/home/homescreen_widgets/featured_products.dart';
 import 'package:koreanza/view/home/homescreen_widgets/custom_tabbar.dart';
 import 'package:koreanza/view/home/homescreen_widgets/review_container.dart';
 import 'package:koreanza/view/profile/profile_screen.dart';
+import 'package:koreanza/view/shopping/shopping_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -143,11 +144,11 @@ class HomeScreen extends StatelessWidget {
           actionsPadding: EdgeInsets.only(right: 10.w),
         ),
         body: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 30.h),
-            child: Column(
-              children: [
-                Container(
+          child: Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.only(left: 20.w, right: 20.w, top: 30.h),
+                child: Container(
                   height: 250.h,
                   width: double.infinity,
                   decoration: BoxDecoration(
@@ -193,14 +194,24 @@ class HomeScreen extends StatelessWidget {
                           width: 150.w,
                           height: 50.h,
                           text: "Shop Now",
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ShoppingScreen(),
+                              ),
+                            );
+                          },
                         ),
                       ],
                     ),
                   ),
                 ),
-                SizedBox(height: 30.h),
-                Row(
+              ),
+              SizedBox(height: 30.h),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: Row(
                   children: [
                     Text(
                       "Categories",
@@ -221,10 +232,16 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                SizedBox(height: 20.h),
-                CustomTabBar(),
-                SizedBox(height: 20.h),
-                Container(
+              ),
+              SizedBox(height: 20.h),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 15.w),
+                child: CustomTabBar(),
+              ),
+              SizedBox(height: 20.h),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: Container(
                   height: 200.h,
                   width: double.infinity,
                   decoration: BoxDecoration(
@@ -280,30 +297,32 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                SizedBox(height: 20.h),
-                FeaturedProducts(),
-                Text(
-                  "Radiant Reviews",
-                  style: TextStyle(
-                    fontSize: 20.sp,
-                    fontWeight: FontWeight.w600,
-                    fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
-                    color: appColors.title,
-                  ),
+              ),
+              SizedBox(height: 20.h),
+              FeaturedProducts(),
+              SizedBox(height: 20.h),
+              Text(
+                "Radiant Reviews",
+                style: TextStyle(
+                  fontSize: 20.sp,
+                  fontWeight: FontWeight.w600,
+                  fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
+                  color: appColors.title,
                 ),
-                Text(
-                  "See what our community is saying",
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w400,
-                    fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
-                    color: appColors.subtitle,
-                  ),
+              ),
+              Text(
+                "See what our community is saying",
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w400,
+                  fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
+                  color: appColors.subtitle,
                 ),
-                SizedBox(height: 20.h),
-                ReviewSection(),
-              ],
-            ),
+              ),
+              SizedBox(height: 20.h),
+              ReviewSection(),
+              SizedBox(height: 30.h),
+            ],
           ),
         ),
       ),
