@@ -97,7 +97,7 @@ class HomeScreen extends StatelessWidget {
         }
       },
       child: Scaffold(
-        drawer: CustomDrawer(),
+        drawer: const CustomDrawer(),
         drawerEnableOpenDragGesture: false,
         backgroundColor: appColors.bg,
         appBar: AppBar(

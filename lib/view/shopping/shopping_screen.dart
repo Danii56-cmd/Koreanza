@@ -3,43 +3,50 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:koreanza/core/app_colors.dart';
 import 'package:koreanza/core/app_constants.dart';
-import 'package:koreanza/models/shopproducts_model.dart';
+import 'package:koreanza/models/products_model.dart';
+import 'package:koreanza/providers/cart_provider.dart';
+import 'package:koreanza/providers/wishlist_provider.dart';
 import 'package:koreanza/sharedwidgets/custom_drawer.dart';
 import 'package:koreanza/sharedwidgets/custom_popscope.dart';
 import 'package:koreanza/view/productdetails/product_details_screen.dart';
 import 'package:koreanza/view/profile/profile_screen.dart';
+import 'package:provider/provider.dart';
 
 // Sample data
-final List<Product> _products = [
-  Product(
+final List<ProductModel> _products = [
+  ProductModel(
+    id: "1",
     name: 'Dewy Petal Essence',
     subtitle: 'Hydrating Glow\nSerum',
-    price: 'Pkr 999',
+    price: 999,
     rating: 4.9,
     image: AppConstants.shopIcon1,
     badge: 'BEST SELLER',
     badgeColor: Color(0xFFFF6B8A),
   ),
-  Product(
+  ProductModel(
+    id: "2",
     name: 'Cloud Whipped Cream',
     subtitle: 'Ceramide\nMoisturizer',
-    price: 'Pkr 999',
+    price: 999,
     rating: 4.8,
     image: AppConstants.shopIcon2,
   ),
-  Product(
+  ProductModel(
+    id: "3",
     name: 'Velvet Rose Cleanser',
     subtitle: 'Gentle Foaming\nWash',
-    price: 'Pkr 999',
+    price: 999,
     rating: 4.7,
     image: AppConstants.shopIcon3,
     badge: 'ECO-CHOICE',
     badgeColor: Color(0xFF4CAF50),
   ),
-  Product(
+  ProductModel(
+    id: "4",
     name: 'Moonlight Night Oil',
     subtitle: 'Restorative Elixir',
-    price: 'Pkr 999',
+    price: 999,
     rating: 5.0,
     image: AppConstants.shopIcon4,
   ),
@@ -242,7 +249,7 @@ class _FilterChip extends StatelessWidget {
 
 // Product card
 class ProductCard extends StatefulWidget {
-  final Product product;
+  final ProductModel product;
   const ProductCard({super.key, required this.product});
 
   @override
@@ -250,12 +257,12 @@ class ProductCard extends StatefulWidget {
 }
 
 class _ProductCardState extends State<ProductCard> {
-  bool _isFav = false;
-
   @override
   Widget build(BuildContext context) {
     final appColors = AppColors.of(context);
-    final p = widget.product;
+    final product = widget.product;
+    final wishlist = context.watch<WishlistProvider>();
+    final isFav = wishlist.isWishlisted(product.id);
 
     return Container(
       decoration: BoxDecoration(
@@ -287,7 +294,7 @@ class _ProductCardState extends State<ProductCard> {
                     top: Radius.circular(16.r),
                   ),
                   child: Image.asset(
-                    p.image,
+                    product.image,
                     height: 160.h,
                     width: double.infinity,
                     fit: BoxFit.cover,
@@ -295,7 +302,7 @@ class _ProductCardState extends State<ProductCard> {
                 ),
 
                 // Badge bottom-left (only if provided)
-                if (p.badge != null)
+                if (product.badge != null)
                   Positioned(
                     bottom: 10.h,
                     left: 10.w,
@@ -305,11 +312,11 @@ class _ProductCardState extends State<ProductCard> {
                         vertical: 4.h,
                       ),
                       decoration: BoxDecoration(
-                        color: p.badgeColor,
+                        color: product.badgeColor,
                         borderRadius: BorderRadius.circular(20.r),
                       ),
                       child: Text(
-                        p.badge!,
+                        product.badge!,
                         style: TextStyle(
                           fontSize: 9.sp,
                           color: appColors.surface,
@@ -325,7 +332,19 @@ class _ProductCardState extends State<ProductCard> {
                   top: 8.r,
                   right: 8.r,
                   child: GestureDetector(
-                    onTap: () => setState(() => _isFav = !_isFav),
+                    onTap: () {
+                      context.read<WishlistProvider>().toggleWishlist(product);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            isFav
+                                ? "Removed from wishlist"
+                                : "Added to wishlist",
+                          ),
+                          duration: Duration(seconds: 1),
+                        ),
+                      );
+                    },
                     child: Container(
                       width: 32.r,
                       height: 32.r,
@@ -340,9 +359,11 @@ class _ProductCardState extends State<ProductCard> {
                         ],
                       ),
                       child: Icon(
-                        _isFav ? Icons.favorite : Icons.favorite_border,
+                        isFav ? Icons.favorite : Icons.favorite_border,
                         size: 16.r,
-                        color: appColors.iconColor,
+                        color: isFav
+                            ? appColors.iconColor
+                            : appColors.iconColor,
                       ),
                     ),
                   ),
@@ -363,7 +384,7 @@ class _ProductCardState extends State<ProductCard> {
                     Icon(Icons.star, color: appColors.primary, size: 13.r),
                     SizedBox(width: 3.w),
                     Text(
-                      p.rating.toString(),
+                      product.rating.toString(),
                       style: TextStyle(
                         fontSize: 12.sp,
                         color: appColors.title,
@@ -376,7 +397,7 @@ class _ProductCardState extends State<ProductCard> {
 
                 // Product name
                 Text(
-                  p.name,
+                  product.name,
                   style: TextStyle(
                     fontSize: 12.sp,
                     fontWeight: FontWeight.w400,
@@ -390,7 +411,7 @@ class _ProductCardState extends State<ProductCard> {
 
                 // Subtitle
                 Text(
-                  p.subtitle,
+                  product.subtitle,
                   style: TextStyle(
                     fontSize: 10.sp,
                     color: appColors.subtitle,
@@ -402,7 +423,7 @@ class _ProductCardState extends State<ProductCard> {
                 SizedBox(height: 8.h),
                 // Price
                 Text(
-                  p.price,
+                  "Pkr ${product.price}",
                   style: TextStyle(
                     fontSize: 16.sp,
                     fontWeight: FontWeight.w800,
@@ -416,7 +437,16 @@ class _ProductCardState extends State<ProductCard> {
                   width: double.infinity,
                   height: 35.h,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      // Add to cart
+                      context.read<CartProvider>().addToCart(product);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("${product.name} added to cart"),
+                          duration: Duration(seconds: 1),
+                        ),
+                      );
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: appColors.primary,
                       foregroundColor: appColors.surface,

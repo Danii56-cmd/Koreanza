@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:koreanza/core/app_colors.dart';
+import 'package:koreanza/models/cart_model.dart';
 import 'package:koreanza/sharedwidgets/custom_drawer.dart';
 import 'package:koreanza/sharedwidgets/custom_popscope.dart';
 import 'package:koreanza/sharedwidgets/custombutton.dart';
-import 'package:koreanza/models/shopproducts_model.dart';
 import 'package:koreanza/view/orderhistory/order_history_screen.dart';
 import 'package:koreanza/view/profile/profile_screen.dart';
 
 class CheckoutScreen extends StatelessWidget {
-  final List<Map<String, dynamic>> cartItems;
+  final List<CartItemModel> cartItems;
   final int subtotal;
 
   const CheckoutScreen({
@@ -379,8 +379,9 @@ class CheckoutScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 10.h),
                         ...cartItems.map((item) {
-                          final product = item['product'] as Product;
-                          final qty = item['qty'] as int;
+                          final product = item.product;
+                          final qty = item.qty;
+
                           return Padding(
                             padding: EdgeInsets.only(bottom: 10.h),
                             child: Row(
@@ -409,9 +410,6 @@ class CheckoutScreen extends StatelessWidget {
                                           fontSize: 14.sp,
                                           fontWeight: FontWeight.w600,
                                           color: appColors.title,
-                                          fontFamily:
-                                              GoogleFonts.plusJakartaSans()
-                                                  .fontFamily,
                                         ),
                                       ),
                                       SizedBox(height: 5.h),
@@ -421,21 +419,15 @@ class CheckoutScreen extends StatelessWidget {
                                           fontSize: 14.sp,
                                           fontWeight: FontWeight.w500,
                                           color: appColors.title,
-                                          fontFamily:
-                                              GoogleFonts.plusJakartaSans()
-                                                  .fontFamily,
                                         ),
                                       ),
                                       SizedBox(height: 5.h),
                                       Text(
-                                        product.price,
+                                        "Pkr ${product.price}",
                                         style: TextStyle(
                                           fontSize: 14.sp,
                                           fontWeight: FontWeight.w600,
                                           color: appColors.primary,
-                                          fontFamily:
-                                              GoogleFonts.plusJakartaSans()
-                                                  .fontFamily,
                                         ),
                                       ),
                                     ],
@@ -444,7 +436,7 @@ class CheckoutScreen extends StatelessWidget {
                               ],
                             ),
                           );
-                        }),
+                        }).toList(),
                         SizedBox(height: 15.h),
                         Divider(color: appColors.border, thickness: 1),
                         SizedBox(height: 15.h),

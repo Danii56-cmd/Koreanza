@@ -3,7 +3,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:koreanza/core/app_colors.dart';
 import 'package:koreanza/core/app_constants.dart';
+import 'package:koreanza/models/products_model.dart';
+import 'package:koreanza/providers/cart_provider.dart';
+import 'package:koreanza/providers/product_providers.dart';
+import 'package:koreanza/providers/wishlist_provider.dart';
 import 'package:koreanza/view/productdetails/product_details_screen.dart';
+import 'package:provider/provider.dart';
 
 class FeaturedProducts extends StatefulWidget {
   const FeaturedProducts({super.key});
@@ -13,18 +18,7 @@ class FeaturedProducts extends StatefulWidget {
 }
 
 class _FeaturedProductsState extends State<FeaturedProducts> {
-  final _scrollController = ScrollController();
-
-  static const _products = [
-    {
-      'name': 'Glow Serum Luxe',
-      'price': '\$42.00',
-      'subtitle': 'Ultra Hydrating',
-    },
-    {'name': 'Velvet Mist', 'price': '\$38.00', 'subtitle': 'Sensitive Skin'},
-    {'name': 'Rose Elixir', 'price': '\$55.00', 'subtitle': 'Anti-Aging'},
-    {'name': 'Hydra Boost', 'price': '\$29.00', 'subtitle': 'Deep Moisture'},
-  ];
+  final ScrollController _scrollController = ScrollController();
 
   void _scroll(bool toRight) {
     final offset = toRight
@@ -36,6 +30,7 @@ class _FeaturedProductsState extends State<FeaturedProducts> {
             0.0,
             _scrollController.position.maxScrollExtent,
           );
+
     _scrollController.animateTo(
       offset,
       duration: const Duration(milliseconds: 400),
@@ -52,11 +47,13 @@ class _FeaturedProductsState extends State<FeaturedProducts> {
   @override
   Widget build(BuildContext context) {
     final appColors = AppColors.of(context);
+    final productProvider = Provider.of<ProductProvider>(context);
+    final products = productProvider.products;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Header row
+        // HEADER
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 20.w),
           child: Row(
@@ -90,22 +87,19 @@ class _FeaturedProductsState extends State<FeaturedProducts> {
           ),
         ),
         SizedBox(height: 14.h),
-        // Horizontal product list
+
+        // PRODUCT LIST
         SizedBox(
           height: 300.h,
           child: ListView.builder(
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
-            itemCount: _products.length,
+            itemCount: products.length,
             padding: EdgeInsets.only(left: 20.w),
             itemBuilder: (context, index) {
-              final product = _products[index];
-              return _ProductCard(
-                name: product['name']!,
-                price: product['price']!,
-                subtitle: product['subtitle']!,
-                appColors: appColors,
-              );
+              final product = products[index];
+
+              return _ProductCard(product: product, appColors: appColors);
             },
           ),
         ),
@@ -136,35 +130,23 @@ class _NavButton extends StatelessWidget {
 }
 
 // Product card
-class _ProductCard extends StatefulWidget {
-  const _ProductCard({
-    required this.name,
-    required this.price,
-    required this.subtitle,
-    required this.appColors,
-  });
+class _ProductCard extends StatelessWidget {
+  const _ProductCard({required this.product, required this.appColors});
 
-  final String name;
-  final String price;
-  final String subtitle;
+  final ProductModel product;
   final AppColors appColors;
 
   @override
-  State<_ProductCard> createState() => _ProductCardState();
-}
-
-class _ProductCardState extends State<_ProductCard> {
-  bool _isFav = false;
-
-  @override
   Widget build(BuildContext context) {
-    final c = widget.appColors;
+    final wishlist = context.watch<WishlistProvider>();
+    final isFav = wishlist.isWishlisted(product.id);
+    final c = appColors;
 
     return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
+      padding: EdgeInsets.only(right: 14.w),
       child: Container(
         width: 200.w,
-        margin: EdgeInsets.only(right: 14.w, bottom: 20.h),
+        margin: EdgeInsets.only(bottom: 20.h),
         decoration: BoxDecoration(
           color: c.surface,
           borderRadius: BorderRadius.circular(20.r),
@@ -179,7 +161,7 @@ class _ProductCardState extends State<_ProductCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image + heart
+            // IMAGE + HEART
             Stack(
               children: [
                 GestureDetector(
@@ -187,7 +169,7 @@ class _ProductCardState extends State<_ProductCard> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const ProductDetailsScreen(),
+                        builder: (_) => const ProductDetailsScreen(),
                       ),
                     );
                   },
@@ -197,60 +179,50 @@ class _ProductCardState extends State<_ProductCard> {
                     ),
                     child: Image.asset(
                       AppConstants.glow,
-                      // color: c.primary.withValues(alpha: 0.2),
                       height: 170.h,
                       width: double.infinity,
                       fit: BoxFit.cover,
                     ),
                   ),
                 ),
-                // Pink gradient overlay at bottom of image
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(20.r),
-                    ),
-                    child: Container(
-                      height: 60.h,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.transparent,
-                            c.primary.withValues(alpha: 0.08),
-                          ],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                // Tappable heart with toggle
+
+                // HEART BUTTON (PROVIDER)
                 Positioned(
                   top: 8.r,
                   right: 8.r,
                   child: GestureDetector(
-                    onTap: () => setState(() => _isFav = !_isFav),
+                    onTap: () {
+                      context.read<WishlistProvider>().toggleWishlist(product);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            isFav
+                                ? "Removed from wishlist"
+                                : "Added to wishlist",
+                          ),
+                          duration: Duration(seconds: 1),
+                        ),
+                      );
+                    },
                     child: Container(
-                      width: 30.r,
-                      height: 30.r,
+                      width: 32.r,
+                      height: 32.r,
                       decoration: BoxDecoration(
-                        color: c.surface,
+                        color: appColors.surface,
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: c.title.withValues(alpha: 0.1),
+                            color: appColors.subtitle.withValues(alpha: 0.1),
                             blurRadius: 6.r,
                           ),
                         ],
                       ),
                       child: Icon(
-                        _isFav ? Icons.favorite : Icons.favorite_border,
+                        isFav ? Icons.favorite : Icons.favorite_border,
                         size: 16.r,
-                        color: _isFav ? Colors.red : c.primary,
+                        color: isFav
+                            ? appColors.iconColor
+                            : appColors.iconColor,
                       ),
                     ),
                   ),
@@ -258,67 +230,65 @@ class _ProductCardState extends State<_ProductCard> {
               ],
             ),
 
-            // Text + button
+            // TEXT INFO
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Name + price on same row
+                  // NAME + PRICE
                   Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Expanded(
                         child: Text(
-                          widget.name,
+                          product.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 14.sp,
                             color: c.title,
                             fontFamily:
                                 GoogleFonts.plusJakartaSans().fontFamily,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       Text(
-                        widget.price,
+                        "Pkr ${product.price}",
                         style: TextStyle(
                           fontSize: 12.sp,
                           fontWeight: FontWeight.w700,
                           color: c.primary,
-                          fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
                         ),
                       ),
                     ],
                   ),
                   SizedBox(height: 3.h),
                   Text(
-                    widget.subtitle,
-                    style: TextStyle(
-                      fontSize: 11.sp,
-                      color: c.subtitle,
-                      fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
-                    ),
+                    product.subtitle,
+                    style: TextStyle(fontSize: 11.sp, color: c.subtitle),
                   ),
                   SizedBox(height: 10.h),
-                  // Add to Cart button
+
+                  // ADD TO CART
                   SizedBox(
                     width: double.infinity,
                     height: 35.h,
                     child: ElevatedButton.icon(
-                      onPressed: () {},
-                      icon: Icon(
-                        Icons.shopping_bag_outlined,
-                        size: 13.r,
-                        // color: c.title,
-                      ),
+                      onPressed: () {
+                        context.read<CartProvider>().addToCart(product);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("${product.name} added to cart"),
+                            duration: Duration(seconds: 1),
+                          ),
+                        );
+                      },
+                      icon: Icon(Icons.shopping_bag_outlined, size: 13.r),
                       label: Text(
                         'Add to Cart',
                         style: TextStyle(
                           fontSize: 11.sp,
                           fontWeight: FontWeight.w600,
-                          fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
@@ -328,7 +298,6 @@ class _ProductCardState extends State<_ProductCard> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10.r),
                         ),
-                        padding: EdgeInsets.zero,
                       ),
                     ),
                   ),

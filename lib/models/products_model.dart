@@ -1,16 +1,19 @@
 // Product model
 import 'dart:ui';
 
-class Product {
+class ProductModel {
+  final String id;
   final String name;
   final String subtitle;
-  final String price;
+  final int price;
   final double rating;
   final String image;
   final String? badge;
   final Color? badgeColor;
+  bool isFavorite;
 
-  const Product({
+  ProductModel({
+    required this.id,
     required this.name,
     required this.subtitle,
     required this.price,
@@ -18,7 +21,6 @@ class Product {
     required this.image,
     this.badge,
     this.badgeColor,
+    this.isFavorite = false,
   });
 }
-
-

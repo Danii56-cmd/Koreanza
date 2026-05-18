@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:koreanza/core/app_colors.dart';
+import 'package:koreanza/providers/auth_provider.dart';
 import 'package:koreanza/sharedwidgets/custombutton.dart';
+import 'package:koreanza/sharedwidgets/main_screen.dart';
 import 'package:koreanza/view/auth/login_screen.dart';
+import 'package:provider/provider.dart';
 
 class SignUpScreen extends StatelessWidget {
   const SignUpScreen({super.key});
@@ -11,6 +14,7 @@ class SignUpScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appColors = AppColors.of(context);
+    final authProvider = Provider.of<AuthProvider>(context);
     return Scaffold(
       body: Container(
         width: double.infinity,
@@ -53,6 +57,7 @@ class SignUpScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     CustomTextField(
+                      controller: authProvider.nameController,
                       hintText: "John Doe",
                       labelText: "Full Name",
                       prefixIcon: Icons.person_outline,
@@ -60,12 +65,14 @@ class SignUpScreen extends StatelessWidget {
                     SizedBox(height: 16.h),
                     // Email Field
                     CustomTextField(
+                      controller: authProvider.emailController,
                       hintText: "hello@korenza.com",
                       labelText: "Email Address",
                       prefixIcon: Icons.email_outlined,
                     ),
                     SizedBox(height: 16.h),
                     CustomTextField(
+                      controller: authProvider.passwordController,
                       hintText: "••••••••",
                       labelText: "Password",
                       prefixIcon: Icons.lock_outline,
@@ -81,6 +88,7 @@ class SignUpScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 16.h),
                     CustomTextField(
+                      controller: authProvider.confirmPasswordController,
                       hintText: "••••••••",
                       labelText: "Confirm Password",
                       prefixIcon: Icons.lock_outline,
@@ -95,11 +103,17 @@ class SignUpScreen extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 24.h),
-                    // Login Button
+                    // Create Account Button
                     CustomButton(
                       text: "Create Account",
                       icon: Icons.arrow_forward,
-                      onPressed: () {},
+                      onPressed: () async {
+                        await authProvider.signUp(context);
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => MainScreen()),
+                        );
+                      },
                     ),
                     SizedBox(height: 24.h),
                     Row(

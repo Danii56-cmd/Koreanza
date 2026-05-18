@@ -3,46 +3,50 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:koreanza/core/app_colors.dart';
-import 'package:koreanza/core/app_constants.dart';
-import 'package:koreanza/models/shopproducts_model.dart';
+import 'package:koreanza/models/products_model.dart';
+import 'package:koreanza/providers/cart_provider.dart';
 import 'package:koreanza/sharedwidgets/custom_drawer.dart';
 import 'package:koreanza/sharedwidgets/custom_popscope.dart';
 import 'package:koreanza/view/checkout/checkout_screen.dart';
 import 'package:koreanza/view/profile/profile_screen.dart';
+import 'package:provider/provider.dart';
 
-// Sample cart data using the shared Product model
-final List<Map<String, dynamic>> _cartItems = [
-  {
-    'product': Product(
-      name: 'Radiance Dew Serum',
-      subtitle: '30ml • Vitality Boost',
-      price: 'Pkr 999',
-      rating: 4.9,
-      image: AppConstants.cartIcon1,
-    ),
-    'qty': 1,
-  },
-  {
-    'product': Product(
-      name: 'Cloud Whip Cream',
-      subtitle: '50g • Intense Hydration',
-      price: 'Pkr 999',
-      rating: 4.8,
-      image: AppConstants.cartIcon2,
-    ),
-    'qty': 2,
-  },
-  {
-    'product': Product(
-      name: 'Pure Petal Cleanser',
-      subtitle: 'Gentle Foaming Wash',
-      price: 'Pkr 999',
-      rating: 4.7,
-      image: AppConstants.cartIcon3,
-    ),
-    'qty': 1,
-  },
-];
+// // Sample cart data using the shared Product model
+// final List<Map<String, dynamic>> _cartItems = [
+//   {
+//     'product': ProductModel(
+//       id: "1",
+//       name: 'Radiance Dew Serum',
+//       subtitle: '30ml • Vitality Boost',
+//       price: 'Pkr 999',
+//       rating: 4.9,
+//       image: AppConstants.cartIcon1,
+//     ),
+//     'qty': 1,
+//   },
+//   {
+//     'product': ProductModel(
+//       id: "2",
+//       name: 'Cloud Whip Cream',
+//       subtitle: '50g • Intense Hydration',
+//       price: 'Pkr 999',
+//       rating: 4.8,
+//       image: AppConstants.cartIcon2,
+//     ),
+//     'qty': 2,
+//   },
+//   {
+//     'product': ProductModel(
+//       id: "3",
+//       name: 'Pure Petal Cleanser',
+//       subtitle: 'Gentle Foaming Wash',
+//       price: 'Pkr 999',
+//       rating: 4.7,
+//       image: AppConstants.cartIcon3,
+//     ),
+//     'qty': 1,
+//   },
+// ];
 
 // CartScreen
 class CartScreen extends StatefulWidget {
@@ -53,34 +57,36 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
-  final List<Map<String, dynamic>> _items = List.from(_cartItems);
+  // final List<Map<String, dynamic>> _items = List.from(_cartItems);
 
-  int get _totalItems => _items.fold(0, (sum, e) => sum + (e['qty'] as int));
+  // int get _totalItems => _items.fold(0, (sum, e) => sum + (e['qty'] as int));
 
-  int get _totalPrice => _items.fold(0, (sum, e) {
-    final raw = (e['product'] as Product).price.replaceAll(
-      RegExp(r'[^0-9]'),
-      '',
-    );
-    return sum + (int.tryParse(raw) ?? 0) * (e['qty'] as int);
-  });
+  // int get _totalPrice => _items.fold(0, (sum, e) {
+  //   final raw = (e['product'] as ProductModel).price.replaceAll(
+  //     RegExp(r'[^0-9]'),
+  //     '',
+  //   );
+  //   return sum + (int.tryParse(raw) ?? 0) * (e['qty'] as int);
+  // });
 
-  void _changeQty(int index, int delta) {
-    setState(() {
-      final newQty = (_items[index]['qty'] as int) + delta;
-      if (newQty < 1) {
-        _items.removeAt(index);
-      } else {
-        _items[index] = {..._items[index], 'qty': newQty};
-      }
-    });
-  }
+  // void _changeQty(int index, int delta) {
+  //   setState(() {
+  //     final newQty = (_items[index]['qty'] as int) + delta;
+  //     if (newQty < 1) {
+  //       _items.removeAt(index);
+  //     } else {
+  //       _items[index] = {..._items[index], 'qty': newQty};
+  //     }
+  //   });
+  // }
 
-  void _removeItem(int index) => setState(() => _items.removeAt(index));
+  // void _removeItem(int index) => setState(() => _items.removeAt(index));
 
   @override
   Widget build(BuildContext context) {
     final appColors = AppColors.of(context);
+    final cartProvider = Provider.of<CartProvider>(context);
+    final items = cartProvider.items;
 
     return CustomPopScope(
       child: Scaffold(
@@ -130,7 +136,7 @@ class _CartScreenState extends State<CartScreen> {
         ),
 
         // Body
-        body: _items.isEmpty
+        body: items.isEmpty
             ? _EmptyCart(appColors: appColors)
             : Column(
                 children: [
@@ -167,7 +173,7 @@ class _CartScreenState extends State<CartScreen> {
                                   borderRadius: BorderRadius.circular(20.r),
                                 ),
                                 child: Text(
-                                  "$_totalItems ITEMS",
+                                  "${cartProvider.totalItems} ITEMS",
                                   style: TextStyle(
                                     fontSize: 12.sp,
                                     fontWeight: FontWeight.w600,
@@ -183,26 +189,32 @@ class _CartScreenState extends State<CartScreen> {
                           ListView.separated(
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
-                            itemCount: _items.length,
+                            itemCount: items.length,
                             separatorBuilder: (_, __) => SizedBox(height: 14.h),
                             itemBuilder: (_, i) => CartItemCard(
-                              product: _items[i]['product'] as Product,
-                              qty: _items[i]['qty'] as int,
+                              product: items[i].product,
+                              qty: items[i].qty,
                               appColors: appColors,
-                              onIncrement: () => _changeQty(i, 1),
-                              onDecrement: () => _changeQty(i, -1),
-                              onDelete: () => _removeItem(i),
+                              onIncrement: () =>
+                                  cartProvider.increaseQty(items[i].product.id),
+                              onDecrement: () =>
+                                  cartProvider.decreaseQty(items[i].product.id),
+                              onDelete: () =>
+                                  cartProvider.removeItem(items[i].product.id),
                             ),
                           ),
                           SizedBox(height: 20.h),
-                          SummaryCard(subtotal: _totalPrice),
+                          SummaryCard(subtotal: cartProvider.totalPrice),
                           SizedBox(height: 20.h),
                         ],
                       ),
                     ),
                   ),
                   // Order Summary
-                  _OrderSummary(totalPrice: _totalPrice, cartItems: _items),
+                  _OrderSummary(
+                    // totalPrice: cartProvider.totalPrice,
+                    // cartItems: items,
+                  ),
                 ],
               ),
       ),
@@ -222,7 +234,7 @@ class CartItemCard extends StatelessWidget {
     required this.onDelete,
   });
 
-  final Product product;
+  final ProductModel product;
   final int qty;
   final AppColors appColors;
   final VoidCallback onIncrement;
@@ -294,7 +306,7 @@ class CartItemCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      product.price,
+                      "Pkr ${product.price}",
                       style: TextStyle(
                         fontSize: 15.sp,
                         fontWeight: FontWeight.bold,
@@ -440,14 +452,15 @@ class SummaryCard extends StatelessWidget {
   }
 }
 
+// Order Summary Widget
 class _OrderSummary extends StatelessWidget {
-  final int totalPrice;
-  final List<Map<String, dynamic>> cartItems;
-  const _OrderSummary({required this.totalPrice, required this.cartItems});
+  const _OrderSummary();
 
   @override
   Widget build(BuildContext context) {
     final appColors = AppColors.of(context);
+    final cartProvider = Provider.of<CartProvider>(context);
+
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 10.h),
       decoration: BoxDecoration(
@@ -472,7 +485,9 @@ class _OrderSummary extends StatelessWidget {
               borderRadius: BorderRadius.circular(10),
             ),
           ),
+
           SizedBox(height: 20.h),
+
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -485,7 +500,7 @@ class _OrderSummary extends StatelessWidget {
                     style: TextStyle(fontSize: 10.sp, color: appColors.title),
                   ),
                   Text(
-                    "Pkr $totalPrice",
+                    "PKR ${cartProvider.totalPrice}",
                     style: TextStyle(
                       fontSize: 24.sp,
                       fontWeight: FontWeight.bold,
@@ -495,6 +510,7 @@ class _OrderSummary extends StatelessWidget {
                   ),
                 ],
               ),
+
               Text(
                 "Includes all taxes",
                 style: TextStyle(
@@ -505,22 +521,26 @@ class _OrderSummary extends StatelessWidget {
               ),
             ],
           ),
+
           SizedBox(height: 20.h),
+
           SizedBox(
             width: 270.w,
             height: 50.h,
             child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => CheckoutScreen(
-                      cartItems: cartItems,
-                      subtotal: totalPrice,
-                    ),
-                  ),
-                );
-              },
+              onPressed: cartProvider.items.isEmpty
+                  ? null
+                  : () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => CheckoutScreen(
+                            cartItems: cartProvider.items,
+                            subtotal: cartProvider.totalPrice,
+                          ),
+                        ),
+                      );
+                    },
               style: ElevatedButton.styleFrom(
                 backgroundColor: appColors.primary,
                 shape: RoundedRectangleBorder(

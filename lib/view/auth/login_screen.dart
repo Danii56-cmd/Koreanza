@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:koreanza/core/app_colors.dart';
 import 'package:koreanza/core/app_constants.dart';
+import 'package:koreanza/providers/auth_provider.dart';
 import 'package:koreanza/sharedwidgets/custombutton.dart';
 import 'package:koreanza/sharedwidgets/main_screen.dart';
 import 'package:koreanza/view/auth/signup_screen.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -12,6 +14,7 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appColors = AppColors.of(context);
+    final authProvider = Provider.of<AuthProvider>(context);
 
     return Scaffold(
       body: Container(
@@ -71,6 +74,7 @@ class LoginScreen extends StatelessWidget {
                   children: [
                     // Email Field
                     CustomTextField(
+                      controller: authProvider.emailController,
                       hintText: "hello@korenza.com",
                       labelText: "Email Address",
                       prefixIcon: Icons.email_outlined,
@@ -100,17 +104,22 @@ class LoginScreen extends StatelessWidget {
                       ],
                     ),
                     CustomTextField(
+                      controller: authProvider.passwordController,
                       hintText: "••••••••",
                       labelText: "",
                       prefixIcon: Icons.lock_outline,
                       isPassword: true,
                       suffix: IconButton(
                         icon: Icon(
-                          Icons.visibility_outlined,
+                          authProvider.isPasswordVisible
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
                           color: appColors.subtitle,
                           size: 20.sp,
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          authProvider.togglePasswordVisibility();
+                        },
                       ),
                     ),
                     SizedBox(height: 24.h),
@@ -118,7 +127,8 @@ class LoginScreen extends StatelessWidget {
                     CustomButton(
                       text: "Login",
                       icon: Icons.arrow_forward,
-                      onPressed: () {
+                      onPressed: () async {
+                        await authProvider.login(context);
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(builder: (context) => MainScreen()),
@@ -275,6 +285,7 @@ class CustomTextField extends StatelessWidget {
   final IconData prefixIcon;
   final bool isPassword;
   final Widget? suffix;
+  final TextEditingController controller;
 
   const CustomTextField({
     super.key,
@@ -283,6 +294,7 @@ class CustomTextField extends StatelessWidget {
     required this.labelText,
     this.isPassword = false,
     this.suffix,
+    required this.controller,
   });
 
   @override
@@ -313,6 +325,7 @@ class CustomTextField extends StatelessWidget {
             borderRadius: BorderRadius.circular(16.r),
           ),
           child: TextField(
+            controller: controller,
             obscureText: isPassword,
             style: TextStyle(color: appColors.title, fontSize: 14.sp),
             decoration: InputDecoration(

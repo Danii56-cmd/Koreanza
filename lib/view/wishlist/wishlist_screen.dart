@@ -2,57 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:koreanza/core/app_colors.dart';
-import 'package:koreanza/core/app_constants.dart';
-import 'package:koreanza/models/wishlist_model.dart';
+import 'package:koreanza/models/products_model.dart';
+import 'package:koreanza/providers/wishlist_provider.dart';
 import 'package:koreanza/sharedwidgets/custom_drawer.dart';
 import 'package:koreanza/sharedwidgets/custom_popscope.dart';
 import 'package:koreanza/view/profile/profile_screen.dart';
-
-// Sample data
-final List<WishlistProduct> _wishlistProducts = [
-  WishlistProduct(
-    name: 'Radiance Elixir Serum',
-    subtitle: 'Hydrating Glow\nSerum',
-    price: 'Pkr 999',
-    rating: 4.9,
-    image: AppConstants.wishlistIcon1,
-    badge: 'NEW',
-    badgeColor: Color.fromARGB(255, 255, 209, 227),
-  ),
-  WishlistProduct(
-    name: 'Velvet Cloud Cream',
-    subtitle: 'Ceramide\nMoisturizer',
-    price: 'Pkr 999',
-    rating: 4.8,
-    image: AppConstants.wishlistIcon2,
-    badge: 'BEST SELLER',
-    badgeColor: Color.fromARGB(255, 255, 209, 227),
-  ),
-  WishlistProduct(
-    name: 'Glow Botanical Oil',
-    subtitle: 'Gentle Foaming\nWash',
-    price: 'Pkr 999',
-    rating: 4.7,
-    image: AppConstants.wishlistIcon3,
-    badge: 'VEGAN',
-    badgeColor: Color.fromARGB(255, 255, 209, 227),
-  ),
-  WishlistProduct(
-    name: 'Hydra-Burst Mask',
-    subtitle: 'Restorative Elixir',
-    price: 'Pkr 999',
-    rating: 5.0,
-    image: AppConstants.wishlistIcon4,
-    badge: 'LIMITED',
-    badgeColor: Color.fromARGB(255, 255, 209, 227),
-  ),
-];
+import 'package:provider/provider.dart';
 
 class WishlistScreen extends StatelessWidget {
   const WishlistScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final wishlist = context.watch<WishlistProvider>();
+    final products = wishlist.items;
+
     final appColors = AppColors.of(context);
     final cardWidth = (MediaQuery.of(context).size.width - 40.w - 14.w) / 2;
 
@@ -61,6 +25,7 @@ class WishlistScreen extends StatelessWidget {
         drawer: const CustomDrawer(),
         drawerEnableOpenDragGesture: false,
         backgroundColor: appColors.bg,
+
         appBar: AppBar(
           backgroundColor: appColors.bg,
           centerTitle: false,
@@ -100,13 +65,14 @@ class WishlistScreen extends StatelessWidget {
               },
             ),
           ],
-          actionsPadding: EdgeInsets.only(right: 10.w),
         ),
+
         body: SingleChildScrollView(
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
             child: Column(
               children: [
+                /// HEADER
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -122,7 +88,7 @@ class WishlistScreen extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          "12 Items",
+                          "${wishlist.count} Items",
                           style: TextStyle(
                             fontSize: 12.sp,
                             fontWeight: FontWeight.w500,
@@ -131,6 +97,7 @@ class WishlistScreen extends StatelessWidget {
                         ),
                       ],
                     ),
+
                     Container(
                       height: 40.h,
                       width: 120.w,
@@ -158,35 +125,58 @@ class WishlistScreen extends StatelessWidget {
                     ),
                   ],
                 ),
+
                 SizedBox(height: 20.h),
-                Wrap(
-                  spacing: 14.w,
-                  runSpacing: 14.h,
-                  children: _wishlistProducts
-                      .map(
-                        (p) => SizedBox(
-                          width: cardWidth,
-                          child: WishlistProductCard(product: p),
-                        ),
-                      )
-                      .toList(),
-                ),
-                SizedBox(height: 20.h),
-                Icon(
-                  Icons.auto_awesome_outlined,
-                  color: appColors.secondary,
-                  size: 45.sp,
-                ),
-                Text(
-                  "Add more favorites\nto your ritual",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w400,
-                    fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
-                    color: appColors.subtitle.withValues(alpha: 0.5),
+
+                /// EMPTY STATE
+                if (products.isEmpty)
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height - 250.h,
+                    width: double.infinity,
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.favorite_border, size: 60.sp),
+                          SizedBox(height: 10.h),
+                          Text("No items in wishlist yet"),
+                        ],
+                      ),
+                    ),
+                  )
+                else
+                  Wrap(
+                    spacing: 14.w,
+                    runSpacing: 14.h,
+                    children: products
+                        .map(
+                          (p) => SizedBox(
+                            width: cardWidth,
+                            child: WishlistProductCard(product: p),
+                          ),
+                        )
+                        .toList(),
                   ),
-                ),
+
+                SizedBox(height: 20.h),
+                // If No Products Added To Wishlist
+                if (products.isNotEmpty) ...[
+                  Icon(
+                    Icons.auto_awesome_outlined,
+                    color: appColors.secondary,
+                    size: 45.sp,
+                  ),
+                  Text(
+                    "Add more favorites\nto your ritual",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w400,
+                      fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
+                      color: appColors.subtitle.withValues(alpha: 0.5),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
@@ -197,21 +187,18 @@ class WishlistScreen extends StatelessWidget {
 }
 
 // WishList Product card
-class WishlistProductCard extends StatefulWidget {
-  final WishlistProduct product;
+class WishlistProductCard extends StatelessWidget {
+  final ProductModel product;
+
   const WishlistProductCard({super.key, required this.product});
-
-  @override
-  State<WishlistProductCard> createState() => _WishlistProductCardState();
-}
-
-class _WishlistProductCardState extends State<WishlistProductCard> {
-  bool _isFav = false;
 
   @override
   Widget build(BuildContext context) {
     final appColors = AppColors.of(context);
-    final p = widget.product;
+    final wishlist = context.watch<WishlistProvider>();
+
+    final isFav = wishlist.isWishlisted(product.id);
+    final p = product;
 
     return Container(
       decoration: BoxDecoration(
@@ -221,14 +208,14 @@ class _WishlistProductCardState extends State<WishlistProductCard> {
           BoxShadow(
             color: appColors.subtitle.withValues(alpha: 0.07),
             blurRadius: 12.r,
-            offset: Offset(0, 4),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Image with badge + heart
+          /// IMAGE + BADGE + HEART
           Stack(
             children: [
               ClipRRect(
@@ -241,7 +228,7 @@ class _WishlistProductCardState extends State<WishlistProductCard> {
                 ),
               ),
 
-              // Badge bottom-left (only if provided)
+              /// BADGE
               if (p.badge != null)
                 Positioned(
                   bottom: 10.h,
@@ -267,13 +254,16 @@ class _WishlistProductCardState extends State<WishlistProductCard> {
                   ),
                 ),
 
-              // Heart top-right
+              /// HEART (CONNECTED TO PROVIDER)
               Positioned(
                 top: 8.r,
                 right: 8.r,
                 child: GestureDetector(
-                  onTap: () => setState(() => _isFav = !_isFav),
-                  child: Container(
+                  onTap: () {
+                    context.read<WishlistProvider>().toggleWishlist(p);
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
                     width: 32.r,
                     height: 32.r,
                     decoration: BoxDecoration(
@@ -287,9 +277,9 @@ class _WishlistProductCardState extends State<WishlistProductCard> {
                       ],
                     ),
                     child: Icon(
-                      _isFav ? Icons.favorite : Icons.favorite_border,
+                      isFav ? Icons.favorite : Icons.favorite_border,
                       size: 16.r,
-                      color: appColors.iconColor,
+                      color: isFav ? Colors.red : appColors.iconColor,
                     ),
                   ),
                 ),
@@ -297,13 +287,13 @@ class _WishlistProductCardState extends State<WishlistProductCard> {
             ],
           ),
 
-          // Card body
+          /// CONTENT
           Padding(
             padding: EdgeInsets.fromLTRB(10.w, 10.h, 10.w, 12.h),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Star rating
+                /// RATING
                 Row(
                   children: [
                     Icon(Icons.star, color: appColors.primary, size: 13.r),
@@ -318,37 +308,41 @@ class _WishlistProductCardState extends State<WishlistProductCard> {
                     ),
                   ],
                 ),
+
                 SizedBox(height: 4.h),
 
-                // Product name
+                /// NAME
                 Text(
                   p.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 12.sp,
                     fontWeight: FontWeight.w400,
                     color: appColors.title,
                     fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
+
                 SizedBox(height: 2.h),
 
-                // Subtitle
+                /// SUBTITLE
                 Text(
                   p.subtitle,
+                  maxLines: 2,
                   style: TextStyle(
                     fontSize: 10.sp,
                     color: appColors.subtitle,
                     height: 1.4,
                     fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
                   ),
-                  maxLines: 2,
                 ),
+
                 SizedBox(height: 8.h),
-                // Price
+
+                /// PRICE
                 Text(
-                  p.price,
+                  "K${p.price}",
                   style: TextStyle(
                     fontSize: 16.sp,
                     fontWeight: FontWeight.w800,
@@ -356,8 +350,10 @@ class _WishlistProductCardState extends State<WishlistProductCard> {
                     fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
                   ),
                 ),
+
                 SizedBox(height: 10.h),
-                // Add to Cart button
+
+                /// ADD TO CART
                 SizedBox(
                   width: double.infinity,
                   height: 35.h,
@@ -370,7 +366,6 @@ class _WishlistProductCardState extends State<WishlistProductCard> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15.r),
                       ),
-                      padding: EdgeInsets.zero,
                     ),
                     child: Text(
                       'Add to Cart',
