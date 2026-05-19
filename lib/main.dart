@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:koreanza/core/app_theme.dart';
 import 'package:koreanza/providers/auth_provider.dart';
 import 'package:koreanza/providers/cart_provider.dart';
+import 'package:koreanza/providers/order_provider.dart';
 import 'package:koreanza/providers/product_providers.dart';
 import 'package:koreanza/providers/wishlist_provider.dart';
 import 'package:koreanza/view/splashscreen/splash_screen.dart';
@@ -28,6 +29,7 @@ class MyApp extends StatelessWidget {
             ChangeNotifierProvider(create: (_) => AuthProvider()),
             ChangeNotifierProvider(create: (_) => CartProvider()),
             ChangeNotifierProvider(create: (_) => WishlistProvider()),
+            ChangeNotifierProvider(create: (_) => OrderProvider()),
           ],
           child: MaterialApp(
             debugShowCheckedModeBanner: false,

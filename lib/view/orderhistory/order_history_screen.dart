@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:koreanza/core/app_colors.dart';
 import 'package:koreanza/core/app_constants.dart';
+import 'package:koreanza/models/cart_model.dart';
+import 'package:koreanza/models/order_model.dart';
+import 'package:koreanza/providers/order_provider.dart';
 import 'package:koreanza/sharedwidgets/custom_drawer.dart';
 import 'package:koreanza/sharedwidgets/custom_popscope.dart';
 import 'package:koreanza/view/profile/profile_screen.dart';
+import 'package:provider/provider.dart';
 
-// Data models
+// Tracking helpers
 
 enum TrackingStatus { completed, active, pending }
 
@@ -16,7 +21,6 @@ class TrackingStep {
   final String subtitle;
   final TrackingStatus status;
   final IconData icon;
-
   const TrackingStep({
     required this.label,
     required this.subtitle,
@@ -25,68 +29,54 @@ class TrackingStep {
   });
 }
 
-class OrderProduct {
-  final String name;
-  final String meta;
-  final String tag;
-  final String imageAsset;
+List<TrackingStep> _buildSteps(String status, DateTime orderDate) {
+  final fmt = DateFormat('MMM d, hh:mm a');
+  final placed = fmt.format(orderDate);
+  final processed = fmt.format(orderDate.add(const Duration(days: 1)));
+  final estimatedDelivery = DateFormat(
+    'MMM d',
+  ).format(orderDate.add(const Duration(days: 5)));
 
-  const OrderProduct({
-    required this.name,
-    required this.meta,
-    required this.tag,
-    required this.imageAsset,
-  });
-}
+  final isShipped = status == 'Shipped';
+  final isDelivered = status == 'Delivered';
+  final processComplete = isShipped || isDelivered;
 
-// Screen
-
-class OrderHistoryScreen extends StatelessWidget {
-  OrderHistoryScreen({super.key});
-
-  // Static demo data
-
-  final List<TrackingStep> _steps = [
+  return [
     TrackingStep(
       label: 'Order Placed',
-      subtitle: 'Oct 18, 10:24 AM',
+      subtitle: placed,
       status: TrackingStatus.completed,
       icon: Icons.check,
     ),
     TrackingStep(
       label: 'Processing',
-      subtitle: 'Oct 19, 02:15 PM',
-      status: TrackingStatus.completed,
-      icon: Icons.check,
+      subtitle: processComplete ? processed : 'We are preparing your package.',
+      status: processComplete
+          ? TrackingStatus.completed
+          : TrackingStatus.active,
+      icon: processComplete ? Icons.check : Icons.check,
     ),
     TrackingStep(
       label: 'Shipped',
       subtitle: 'Your package is on its way to the local facility.',
-      status: TrackingStatus.active,
-      icon: Icons.local_shipping_outlined,
+      status: isDelivered
+          ? TrackingStatus.completed
+          : isShipped
+          ? TrackingStatus.active
+          : TrackingStatus.pending,
+      icon: isDelivered ? Icons.check : Icons.local_shipping_outlined,
     ),
     TrackingStep(
       label: 'Delivered',
-      subtitle: 'Estimated Oct 24',
-      status: TrackingStatus.pending,
-      icon: Icons.inventory_2_outlined,
+      subtitle: 'Estimated $estimatedDelivery',
+      status: isDelivered ? TrackingStatus.completed : TrackingStatus.pending,
+      icon: isDelivered ? Icons.check : Icons.inventory_2_outlined,
     ),
   ];
+}
 
-  final List<OrderProduct> _products = [
-    OrderProduct(
-      name: 'Radiance Boost Serum',
-      meta: '30ml • Qty: 1',
-      tag: 'VEGAN',
-      imageAsset: AppConstants.orderHistoryImage,
-    ),
-    OrderProduct(
-      name: 'Dewy Cloud Moisturizer',
-      meta: '50g • Qty: 1',
-      tag: 'CRUELTY-FREE',
-      imageAsset: AppConstants.orderHistoryImage2,
-    ),
-  ];
+class OrderHistoryScreen extends StatelessWidget {
+  const OrderHistoryScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +87,6 @@ class OrderHistoryScreen extends StatelessWidget {
         drawer: const CustomDrawer(),
         drawerEnableOpenDragGesture: false,
         backgroundColor: appColors.bg,
-        // AppBar
         appBar: AppBar(
           backgroundColor: appColors.bg,
           centerTitle: false,
@@ -111,7 +100,7 @@ class OrderHistoryScreen extends StatelessWidget {
             ),
           ),
           title: Text(
-            'Korenza',
+            'Koreanza',
             style: TextStyle(
               fontSize: 24.sp,
               fontWeight: FontWeight.w700,
@@ -127,44 +116,100 @@ class OrderHistoryScreen extends StatelessWidget {
             ),
             IconButton(
               icon: Icon(Icons.person_outline, color: appColors.primary),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ProfileScreen(),
-                  ),
-                );
-              },
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ProfileScreen()),
+              ),
             ),
           ],
           actionsPadding: EdgeInsets.only(right: 10.w),
         ),
-        // Body
-        body: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Order summary card
-                _OrderSummaryCard(appColors: appColors),
-                SizedBox(height: 28.h),
+        body: Consumer<OrderProvider>(
+          builder: (context, provider, _) {
+            if (provider.orders.isEmpty) {
+              return _EmptyState(appColors: appColors);
+            }
+            final order = provider.orders.last;
+            return _OrderDetailBody(order: order, appColors: appColors);
+          },
+        ),
+      ),
+    );
+  }
+}
 
-                // Tracking timeline
-                _TrackingTimeline(steps: _steps, appColors: appColors),
-                SizedBox(height: 28.h),
+// Empty State
 
-                // Package details
-                _PackageDetails(products: _products, appColors: appColors),
-                SizedBox(height: 16.h),
+class _EmptyState extends StatelessWidget {
+  final AppColors appColors;
+  const _EmptyState({required this.appColors});
 
-                // Total paid
-                _TotalPaidCard(appColors: appColors),
-                SizedBox(height: 20.h),
-              ],
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 40.w),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.receipt_long_outlined,
+              size: 72.r,
+              color: appColors.border,
             ),
-          ),
+            SizedBox(height: 16.h),
+            Text(
+              'No Orders Yet',
+              style: TextStyle(
+                fontSize: 20.sp,
+                fontWeight: FontWeight.w700,
+                color: appColors.title,
+                fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
+              ),
+            ),
+            SizedBox(height: 8.h),
+            Text(
+              'Your placed orders will appear here.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 13.sp,
+                color: appColors.subtitle,
+                fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Order Detail Body
+
+class _OrderDetailBody extends StatelessWidget {
+  final OrderModel order;
+  final AppColors appColors;
+  const _OrderDetailBody({required this.order, required this.appColors});
+
+  @override
+  Widget build(BuildContext context) {
+    final steps = _buildSteps(order.status, order.createdAt);
+    return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _OrderSummaryCard(order: order, appColors: appColors),
+            SizedBox(height: 28.h),
+            _TrackingTimeline(steps: steps, appColors: appColors),
+            SizedBox(height: 28.h),
+            _PackageDetails(order: order, appColors: appColors),
+            SizedBox(height: 16.h),
+            _TotalPaidCard(order: order, appColors: appColors),
+            SizedBox(height: 24.h),
+          ],
         ),
       ),
     );
@@ -174,11 +219,17 @@ class OrderHistoryScreen extends StatelessWidget {
 // Order Summary Card
 
 class _OrderSummaryCard extends StatelessWidget {
-  final dynamic appColors;
-  const _OrderSummaryCard({required this.appColors});
+  final OrderModel order;
+  final AppColors appColors;
+  const _OrderSummaryCard({required this.order, required this.appColors});
 
   @override
   Widget build(BuildContext context) {
+    final orderId = 'KRZ-${order.createdAt.millisecondsSinceEpoch % 100000}';
+    final arrivalDate = DateFormat(
+      'EEEE, MMM d',
+    ).format(order.createdAt.add(const Duration(days: 5)));
+
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 15.h),
       width: double.infinity,
@@ -190,8 +241,9 @@ class _OrderSummaryCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Order ID
           Text(
-            'ORDER  #LUM-88291',
+            'ORDER  #$orderId',
             style: TextStyle(
               fontSize: 14.sp,
               fontWeight: FontWeight.w600,
@@ -201,8 +253,10 @@ class _OrderSummaryCard extends StatelessWidget {
             ),
           ),
           SizedBox(height: 4.h),
+
+          // Arrival estimate
           Text(
-            'Arriving Thursday, Oct 24',
+            'Arriving $arrivalDate',
             style: TextStyle(
               fontSize: 14.sp,
               fontWeight: FontWeight.w500,
@@ -210,18 +264,60 @@ class _OrderSummaryCard extends StatelessWidget {
               color: appColors.title,
             ),
           ),
-          SizedBox(height: 4.h),
+          SizedBox(height: 8.h),
+
+          // Recipient name
           Row(
+            children: [
+              Icon(Icons.person_outline, size: 14.r, color: appColors.subtitle),
+              SizedBox(width: 4.w),
+              Text(
+                order.fullName.isNotEmpty ? order.fullName : 'N/A',
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  fontWeight: FontWeight.w500,
+                  color: appColors.title,
+                  fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 4.h),
+
+          // Address
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Icon(Icons.location_on, size: 14.r, color: appColors.subtitle),
               SizedBox(width: 4.w),
+              Expanded(
+                child: Text(
+                  [
+                    if (order.address.isNotEmpty) order.address,
+                    if (order.city.isNotEmpty) order.city,
+                  ].join(', '),
+                  style: TextStyle(
+                    fontSize: 13.sp,
+                    color: appColors.subtitle,
+                    fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 4.h),
+
+          // Phone
+          Row(
+            children: [
+              Icon(Icons.phone_outlined, size: 14.r, color: appColors.subtitle),
+              SizedBox(width: 4.w),
               Text(
-                'Peshawar, Pakistan',
+                order.phone.isNotEmpty ? order.phone : 'N/A',
                 style: TextStyle(
                   fontSize: 13.sp,
-                  fontWeight: FontWeight.w400,
-                  fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
                   color: appColors.subtitle,
+                  fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
                 ),
               ),
             ],
@@ -232,21 +328,23 @@ class _OrderSummaryCard extends StatelessWidget {
   }
 }
 
+
 // Tracking Timeline
 
 class _TrackingTimeline extends StatelessWidget {
   final List<TrackingStep> steps;
-  final dynamic appColors;
-
+  final AppColors appColors;
   const _TrackingTimeline({required this.steps, required this.appColors});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: List.generate(steps.length, (i) {
-        final step = steps[i];
-        final isLast = i == steps.length - 1;
-        return _TimelineRow(step: step, isLast: isLast, appColors: appColors);
+        return _TimelineRow(
+          step: steps[i],
+          isLast: i == steps.length - 1,
+          appColors: appColors,
+        );
       }),
     );
   }
@@ -255,33 +353,22 @@ class _TrackingTimeline extends StatelessWidget {
 class _TimelineRow extends StatelessWidget {
   final TrackingStep step;
   final bool isLast;
-  final dynamic appColors;
-
+  final AppColors appColors;
   const _TimelineRow({
     required this.step,
     required this.isLast,
     required this.appColors,
   });
 
-  Color get _bubbleBg {
-    switch (step.status) {
-      case TrackingStatus.completed:
-      case TrackingStatus.active:
-        return appColors.primary;
-      case TrackingStatus.pending:
-        return appColors.surface;
-    }
-  }
+  Color get _bubbleBg => switch (step.status) {
+    TrackingStatus.completed || TrackingStatus.active => appColors.primary,
+    TrackingStatus.pending => appColors.surface,
+  };
 
-  Color get _bubbleFg {
-    switch (step.status) {
-      case TrackingStatus.completed:
-      case TrackingStatus.active:
-        return appColors.surface;
-      case TrackingStatus.pending:
-        return appColors.subtitle;
-    }
-  }
+  Color get _bubbleFg => switch (step.status) {
+    TrackingStatus.completed || TrackingStatus.active => appColors.surface,
+    TrackingStatus.pending => appColors.subtitle,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -292,12 +379,11 @@ class _TimelineRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Left: bubble + connector line
+          // Bubble + connector
           SizedBox(
             width: 44.w,
             child: Column(
               children: [
-                // Bubble
                 Container(
                   width: 36.r,
                   height: 36.r,
@@ -319,7 +405,6 @@ class _TimelineRow extends StatelessWidget {
                   ),
                   child: Icon(step.icon, color: _bubbleFg, size: 16.r),
                 ),
-                // Connector
                 if (!isLast)
                   Expanded(
                     child: Container(
@@ -336,13 +421,13 @@ class _TimelineRow extends StatelessWidget {
 
           SizedBox(width: 12.w),
 
-          // Right: content
+          // Content
           Expanded(
             child: Padding(
               padding: EdgeInsets.only(bottom: isLast ? 0 : 20.h),
               child: isActive
-                  ? _ActiveShippedCard(step: step, appColors: appColors)
-                  : _SimpleStepContent(step: step, appColors: appColors),
+                  ? _ActiveStepCard(step: step, appColors: appColors)
+                  : _StepContent(step: step, appColors: appColors),
             ),
           ),
         ],
@@ -351,17 +436,15 @@ class _TimelineRow extends StatelessWidget {
   }
 }
 
-// Plain step (Order Placed, Processing, Delivered)
-class _SimpleStepContent extends StatelessWidget {
+// step content
+class _StepContent extends StatelessWidget {
   final TrackingStep step;
-  final dynamic appColors;
-
-  const _SimpleStepContent({required this.step, required this.appColors});
+  final AppColors appColors;
+  const _StepContent({required this.step, required this.appColors});
 
   @override
   Widget build(BuildContext context) {
     final isPending = step.status == TrackingStatus.pending;
-
     return Padding(
       padding: EdgeInsets.only(top: 6.h),
       child: Column(
@@ -381,7 +464,6 @@ class _SimpleStepContent extends StatelessWidget {
             step.subtitle,
             style: TextStyle(
               fontSize: 12.sp,
-              fontWeight: FontWeight.w400,
               fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
               color: appColors.subtitle,
             ),
@@ -392,12 +474,11 @@ class _SimpleStepContent extends StatelessWidget {
   }
 }
 
-// Expanded "Shipped" card with map placeholder
-class _ActiveShippedCard extends StatelessWidget {
+// Active step card — shown for Processing, Shipped, or any active step
+class _ActiveStepCard extends StatelessWidget {
   final TrackingStep step;
-  final dynamic appColors;
-
-  const _ActiveShippedCard({required this.step, required this.appColors});
+  final AppColors appColors;
+  const _ActiveStepCard({required this.step, required this.appColors});
 
   @override
   Widget build(BuildContext context) {
@@ -415,7 +496,7 @@ class _ActiveShippedCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Shipped',
+            step.label,
             style: TextStyle(
               fontSize: 14.sp,
               fontWeight: FontWeight.w700,
@@ -428,21 +509,18 @@ class _ActiveShippedCard extends StatelessWidget {
             step.subtitle,
             style: TextStyle(
               fontSize: 13.sp,
-              fontWeight: FontWeight.w400,
               fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
               color: appColors.title,
             ),
           ),
           SizedBox(height: 12.h),
-          // Map placeholder
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: appColors.secondary.withValues(alpha: 0.3),
-            ),
+          // Tracking map image shown for all active steps
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8.r),
             child: Image.asset(
               AppConstants.locationIcon,
               height: 120.h,
+              width: double.infinity,
               fit: BoxFit.cover,
             ),
           ),
@@ -455,10 +533,9 @@ class _ActiveShippedCard extends StatelessWidget {
 // Package Details
 
 class _PackageDetails extends StatelessWidget {
-  final List<OrderProduct> products;
-  final dynamic appColors;
-
-  const _PackageDetails({required this.products, required this.appColors});
+  final OrderModel order;
+  final AppColors appColors;
+  const _PackageDetails({required this.order, required this.appColors});
 
   @override
   Widget build(BuildContext context) {
@@ -482,11 +559,11 @@ class _PackageDetails extends StatelessWidget {
             border: Border.all(color: appColors.border, width: 1.2),
           ),
           child: Column(
-            children: List.generate(products.length, (i) {
-              final isLast = i == products.length - 1;
+            children: List.generate(order.items.length, (i) {
+              final isLast = i == order.items.length - 1;
               return Column(
                 children: [
-                  _ProductTile(product: products[i], appColors: appColors),
+                  _ProductTile(item: order.items[i], appColors: appColors),
                   if (!isLast)
                     Divider(
                       height: 1,
@@ -505,19 +582,24 @@ class _PackageDetails extends StatelessWidget {
   }
 }
 
+// product tile
 class _ProductTile extends StatelessWidget {
-  final OrderProduct product;
-  final dynamic appColors;
-
-  const _ProductTile({required this.product, required this.appColors});
+  final CartItemModel item;
+  final AppColors appColors;
+  const _ProductTile({required this.item, required this.appColors});
 
   @override
   Widget build(BuildContext context) {
+    final product = item.product;
+    final qty = item.qty;
+    final tag = (product.badge != null && product.badge!.isNotEmpty)
+        ? product.badge!
+        : 'NATURAL';
+
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
       child: Row(
         children: [
-          // Product image
           ClipRRect(
             borderRadius: BorderRadius.circular(8.r),
             child: Container(
@@ -525,7 +607,7 @@ class _ProductTile extends StatelessWidget {
               height: 60.r,
               color: appColors.primary.withValues(alpha: 0.08),
               child: Image.asset(
-                product.imageAsset,
+                product.image,
                 fit: BoxFit.cover,
                 errorBuilder: (_, __, ___) => Icon(
                   Icons.spa_outlined,
@@ -536,7 +618,6 @@ class _ProductTile extends StatelessWidget {
             ),
           ),
           SizedBox(width: 12.w),
-          // Name, meta, tag
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -552,16 +633,14 @@ class _ProductTile extends StatelessWidget {
                 ),
                 SizedBox(height: 3.h),
                 Text(
-                  product.meta,
+                  '${product.subtitle}  •  Qty: $qty',
                   style: TextStyle(
                     fontSize: 12.sp,
-                    fontWeight: FontWeight.w400,
                     fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
                     color: appColors.subtitle,
                   ),
                 ),
                 SizedBox(height: 6.h),
-                // Tag chip
                 Container(
                   padding: EdgeInsets.symmetric(
                     horizontal: 10.w,
@@ -572,7 +651,7 @@ class _ProductTile extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20.r),
                   ),
                   child: Text(
-                    product.tag,
+                    tag.toUpperCase(),
                     style: TextStyle(
                       fontSize: 10.sp,
                       fontWeight: FontWeight.w700,
@@ -592,10 +671,10 @@ class _ProductTile extends StatelessWidget {
 }
 
 // Total Paid Card
-
 class _TotalPaidCard extends StatelessWidget {
-  final dynamic appColors;
-  const _TotalPaidCard({required this.appColors});
+  final OrderModel order;
+  final AppColors appColors;
+  const _TotalPaidCard({required this.order, required this.appColors});
 
   @override
   Widget build(BuildContext context) {
@@ -624,7 +703,7 @@ class _TotalPaidCard extends StatelessWidget {
                 ),
               ),
               Text(
-                'PKr 999',
+                'PKR ${order.total}',
                 style: TextStyle(
                   fontSize: 15.sp,
                   fontWeight: FontWeight.w700,
@@ -638,10 +717,9 @@ class _TotalPaidCard extends StatelessWidget {
           Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              'Visa ending in 4242  •  Bill to 221B Baker St.',
+              '${order.paymentMethod}  •  ${order.address}, ${order.city}',
               style: TextStyle(
                 fontSize: 12.sp,
-                fontWeight: FontWeight.w400,
                 fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
                 color: appColors.subtitle,
               ),

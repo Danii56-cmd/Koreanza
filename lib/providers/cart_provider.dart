@@ -67,4 +67,10 @@ class CartProvider extends ChangeNotifier {
   bool isInCart(String productId) {
     return _items.any((e) => e.product.id == productId);
   }
+
+  // CLEAR ALL ITEMS (call after order is placed)
+  void clearCart() {
+    _items.clear();
+    notifyListeners();
+  }
 }
