@@ -10,7 +10,7 @@ class ProductProvider extends ChangeNotifier {
       subtitle: "Ultra Hydrating",
       price: 999,
       rating: 4.8,
-      image: AppConstants.glow,
+      image: AppConstants.wishlistIcon1,
     ),
 
     ProductModel(
@@ -19,7 +19,7 @@ class ProductProvider extends ChangeNotifier {
       subtitle: "Sensitive Skin",
       price: 999,
       rating: 4.5,
-      image: AppConstants.glow,
+      image: AppConstants.wishlistIcon2,
     ),
 
     ProductModel(
@@ -28,7 +28,7 @@ class ProductProvider extends ChangeNotifier {
       subtitle: "Anti-Aging",
       price: 999,
       rating: 4.9,
-      image: AppConstants.glow,
+      image: AppConstants.wishlistIcon3,
     ),
 
     ProductModel(
@@ -37,7 +37,7 @@ class ProductProvider extends ChangeNotifier {
       subtitle: "Deep Moisture",
       price: 999,
       rating: 4.3,
-      image: AppConstants.glow,
+      image: AppConstants.wishlistIcon4,
     ),
   ];
 

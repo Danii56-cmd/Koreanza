@@ -15,7 +15,7 @@ import 'package:provider/provider.dart';
 // Sample data
 final List<ProductModel> _products = [
   ProductModel(
-    id: "1",
+    id: "s1",
     name: 'Dewy Petal Essence',
     subtitle: 'Hydrating Glow\nSerum',
     price: 999,
@@ -25,7 +25,7 @@ final List<ProductModel> _products = [
     badgeColor: Color(0xFFFF6B8A),
   ),
   ProductModel(
-    id: "2",
+    id: "s2",
     name: 'Cloud Whipped Cream',
     subtitle: 'Ceramide\nMoisturizer',
     price: 999,
@@ -33,7 +33,7 @@ final List<ProductModel> _products = [
     image: AppConstants.shopIcon2,
   ),
   ProductModel(
-    id: "3",
+    id: "s3",
     name: 'Velvet Rose Cleanser',
     subtitle: 'Gentle Foaming\nWash',
     price: 999,
@@ -43,7 +43,7 @@ final List<ProductModel> _products = [
     badgeColor: Color(0xFF4CAF50),
   ),
   ProductModel(
-    id: "4",
+    id: "s4",
     name: 'Moonlight Night Oil',
     subtitle: 'Restorative Elixir',
     price: 999,

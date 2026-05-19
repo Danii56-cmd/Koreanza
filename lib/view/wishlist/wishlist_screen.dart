@@ -137,9 +137,19 @@ class WishlistScreen extends StatelessWidget {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.favorite_border, size: 60.sp),
+                          Icon(
+                            Icons.favorite_border,
+                            size: 60.sp,
+                            color: appColors.primary,
+                          ),
                           SizedBox(height: 10.h),
-                          Text("No items in wishlist yet"),
+                          Text(
+                            "No items in wishlist yet",
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              color: appColors.primary,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -279,7 +289,7 @@ class WishlistProductCard extends StatelessWidget {
                     child: Icon(
                       isFav ? Icons.favorite : Icons.favorite_border,
                       size: 16.r,
-                      color: isFav ? Colors.red : appColors.iconColor,
+                      color: isFav ? appColors.iconColor : appColors.iconColor,
                     ),
                   ),
                 ),

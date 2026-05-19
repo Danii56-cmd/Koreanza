@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:koreanza/core/app_colors.dart';
-import 'package:koreanza/core/app_constants.dart';
 import 'package:koreanza/models/products_model.dart';
 import 'package:koreanza/providers/cart_provider.dart';
 import 'package:koreanza/providers/product_providers.dart';
@@ -178,7 +177,7 @@ class _ProductCard extends StatelessWidget {
                       top: Radius.circular(20.r),
                     ),
                     child: Image.asset(
-                      AppConstants.glow,
+                      product.image,
                       height: 170.h,
                       width: double.infinity,
                       fit: BoxFit.cover,
