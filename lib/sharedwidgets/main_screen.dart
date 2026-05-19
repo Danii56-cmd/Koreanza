@@ -19,7 +19,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
-  bool _showRoutineTab = false;
+  bool _isRoutineActive = false;
 
   final List<GlobalKey<NavigatorState>> _navigatorKeys = List.generate(
     5,
@@ -29,9 +29,9 @@ class _MainScreenState extends State<MainScreen> {
   List<Widget> get _screens => [
     const HomeScreen(),
     const ShoppingScreen(),
-    _showRoutineTab ? RoutineScreen() : const WishlistScreen(),
+    _isRoutineActive ? RoutineScreen() : const WishlistScreen(),
     const CartScreen(),
-    const ProfileScreen(isTab: true), // ← CHANGED
+    const ProfileScreen(isTab: true),
   ];
 
   List<_NavItem> get _navItems => [
@@ -42,7 +42,7 @@ class _MainScreenState extends State<MainScreen> {
       activeIcon: Icons.grid_view,
     ),
     _NavItem(
-      label: _showRoutineTab ? 'ROUTINE' : 'WISHLIST',
+      label: _isRoutineActive ? 'ROUTINE' : 'WISHLIST',
       icon: Icons.favorite_outline,
       activeIcon: Icons.favorite,
     ),
@@ -90,7 +90,7 @@ class _MainScreenState extends State<MainScreen> {
 
   void showRoutineTab() {
     setState(() {
-      _showRoutineTab = true;
+      _isRoutineActive = true;
       _selectedIndex = 2;
     });
     TabNavigationService.instance.notifyTabChange(2);
@@ -98,24 +98,38 @@ class _MainScreenState extends State<MainScreen> {
 
   void showWishlistTab() {
     setState(() {
-      _showRoutineTab = false;
+      _isRoutineActive = false;
       _selectedIndex = 2;
     });
     TabNavigationService.instance.notifyTabChange(2);
   }
 
   void _onPopInvoked(bool didPop, _) {
-    final NavigatorState? nav = _navigatorKeys[_selectedIndex].currentState;
+    final nav = _navigatorKeys[_selectedIndex].currentState;
+
     if (nav != null && nav.canPop()) {
       nav.pop();
-    } else if (_selectedIndex != 0) {
+      return;
+    }
+
+    if (_selectedIndex == 2 && _isRoutineActive) {
+      setState(() {
+        _isRoutineActive = false;
+        _selectedIndex = 0;
+      });
+
+      TabNavigationService.instance.notifyTabChange(0);
+      return;
+    }
+
+    if (_selectedIndex != 0) {
       setState(() => _selectedIndex = 0);
       TabNavigationService.instance.notifyTabChange(0);
     }
   }
 
   void _onTabTapped(int index) {
-    if (index == 2) setState(() => _showRoutineTab = false);
+    if (index == 2) setState(() => _isRoutineActive = false);
     if (_selectedIndex == index) {
       _navigatorKeys[index].currentState?.popUntil((route) => route.isFirst);
     } else {

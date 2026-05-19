@@ -40,10 +40,10 @@ class TabNavigationService {
   }
 
   void goToHome() => switchTab(0);
-  void openRoutineTab() => _showRoutineTab?.call();
-  void openWishlistTab() => _showWishlistTab?.call();
+  void showRoutineTab() => _showRoutineTab?.call();
+  void showWishlistTab() => _showWishlistTab?.call();
 
-  /// Pushes any screen on top of the currently active tab's navigator ← NEW
+  /// Pushes any screen on top of the currently active tab's navigator
   void pushScreen(Widget screen) => _pushScreen?.call(screen);
 
   void switchTabAndPush(int index, Widget screen) {

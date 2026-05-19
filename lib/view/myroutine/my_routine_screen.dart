@@ -3,8 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:koreanza/core/app_colors.dart';
 import 'package:koreanza/core/app_constants.dart';
+import 'package:koreanza/services/tab_navigation_service.dart';
 import 'package:koreanza/sharedwidgets/custom_drawer.dart';
-import 'package:koreanza/sharedwidgets/custom_popscope.dart';
 import 'package:koreanza/view/profile/profile_screen.dart';
 
 class RoutineScreen extends StatelessWidget {
@@ -35,7 +35,14 @@ class RoutineScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appColors = AppColors.of(context);
-    return CustomPopScope(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) return;
+
+        TabNavigationService.instance.switchTab(0);
+        TabNavigationService.instance.showWishlistTab();
+      },
       child: Scaffold(
         drawer: const CustomDrawer(),
         drawerEnableOpenDragGesture: false,

@@ -183,7 +183,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                         Navigator.pop(context);
 
                         // Open Routine inside bottom nav
-                        TabNavigationService.instance.openRoutineTab();
+                        TabNavigationService.instance.showRoutineTab();
                       },
                     ),
                     _NavItem(
