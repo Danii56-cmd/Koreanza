@@ -6,6 +6,7 @@ import 'package:koreanza/models/products_model.dart';
 import 'package:koreanza/providers/wishlist_provider.dart';
 import 'package:koreanza/sharedwidgets/custom_drawer.dart';
 import 'package:koreanza/sharedwidgets/custom_popscope.dart';
+import 'package:koreanza/view/productdetails/product_details_screen.dart';
 import 'package:koreanza/view/profile/profile_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -228,13 +229,25 @@ class WishlistProductCard extends StatelessWidget {
           /// IMAGE + BADGE + HEART
           Stack(
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
-                child: Image.asset(
-                  p.image,
-                  height: 160.h,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ProductDetailsScreen(product: p),
+                    ),
+                  );
+                },
+                child: ClipRRect(
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(16.r),
+                  ),
+                  child: Image.asset(
+                    p.image,
+                    height: 160.h,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
 

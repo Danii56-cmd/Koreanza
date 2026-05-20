@@ -3,13 +3,15 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:koreanza/core/app_colors.dart';
 import 'package:koreanza/core/app_constants.dart';
+import 'package:koreanza/models/products_model.dart';
 import 'package:koreanza/sharedwidgets/custom_drawer.dart';
 import 'package:koreanza/sharedwidgets/custom_popscope.dart';
 import 'package:koreanza/view/home/homescreen_widgets/review_container.dart';
 import 'package:koreanza/view/profile/profile_screen.dart';
 
 class ProductDetailsScreen extends StatelessWidget {
-  const ProductDetailsScreen({super.key});
+  final ProductModel product;
+  const ProductDetailsScreen({required this.product, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +74,7 @@ class ProductDetailsScreen extends StatelessWidget {
                     width: double.infinity,
                     decoration: BoxDecoration(
                       image: DecorationImage(
-                        image: AssetImage(AppConstants.productImage),
+                        image: AssetImage(product.image),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -105,7 +107,7 @@ class ProductDetailsScreen extends StatelessWidget {
                             _buildTag("VEGAN", Colors.green[50]!, Colors.green),
                             const Spacer(),
                             Text(
-                              "PKR 999",
+                              "PKR ${product.price}",
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: appColors.primary,
@@ -116,7 +118,7 @@ class ProductDetailsScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 15.h),
                         Text(
-                          "Luminous\nGlow Serum",
+                          product.name,
                           style: TextStyle(
                             fontSize: 26.sp,
                             fontWeight: FontWeight.w600,
@@ -164,7 +166,7 @@ class ProductDetailsScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 10.h),
                         Text(
-                          "Unlock a radiant, lit-from-within complexion with our signature Luminous Glow Serum. Formulated with stabilized Vitamin C and hyaluronic acid to brighten, hydrate, and refine skin texture instantly.",
+                          product.subtitle,
                           style: TextStyle(
                             fontSize: 14.sp,
                             fontFamily:

@@ -284,7 +284,9 @@ class _ProductCardState extends State<ProductCard> {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => ProductDetailsScreen()),
+                MaterialPageRoute(
+                  builder: (_) => ProductDetailsScreen(product: product),
+                ),
               );
             },
             child: Stack(
